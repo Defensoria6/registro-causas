@@ -3,104 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lista de Causas</title>
+  <title>Gestión de Causas</title>
   <style>
-    /* ====== Estilos generales (dashboard) ====== */
-    :root {
-      --bg: #f5f7fb;
-      --card: #fff;
-      --primary: #1f3a93;
-      --accent: #3498db;
-      --danger: #e74c3c;
-      --success: #27ae60;
-      --warning: #f39c12;
-      --muted: #7f8c8d;
-      --radius: 12px;
-      --shadow: 0 4px 15px rgba(0,0,0,.08);
+    /* ====== Estilos generales ====== */
+    :root{
+      --bg:#f5f7fb; --card:#fff; --primary:#1f3a93; --accent:#3498db;
+      --danger:#e74c3c; --success:#27ae60; --warning:#f39c12; --muted:#7f8c8d;
+      --radius:12px; --shadow:0 4px 15px rgba(0,0,0,.08);
+      --tag:#eef2ff;
     }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:#2c3e50; padding:20px; }
-    h1 { text-align:center; color:var(--primary); margin:0 0 15px; }
-    .container { display:flex; gap:20px; align-items:flex-start; }
-    .main { flex:3; }
-    .sidebar { flex:1; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:15px; }
-    .sidebar h2 { margin:0 0 8px; font-size:1.05rem; border-bottom:2px solid var(--accent); padding-bottom:6px; color:var(--accent); }
-    .sidebar li { margin:6px 0; padding:6px 8px; border-left:4px solid var(--accent); background:#f9f9f9; border-radius:4px; font-size:.9rem; }
-    .top-actions { margin:15px 0; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
-    .filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    input[type="text"], select.simple {
-      padding:8px 12px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size:.9rem;
-    }
-    table { width:100%; border-collapse:collapse; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
-    th,td { padding:10px; border-bottom:1px solid #eee; font-size:.9rem; text-align:left; }
-    th { background:var(--primary); color:#fff; }
-    tr:hover td { background:#f9fbff; }
-    .btn { border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:.85rem; transition:.2s; }
-    .btn:hover { opacity:.9; }
-    .btn-nuevo { background:var(--accent); color:#fff; }
-    .btn-print { background:var(--success); color:#fff; }
-    .btn-edit { background:var(--warning); color:#fff; }
-    .btn-delete { background:var(--danger); color:#fff; }
-    .btn-view { background:var(--primary); color:#fff; }
-    .btn-cancel { background:var(--muted); color:#fff; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#2c3e50;padding:20px}
+    h1{margin:0 0 12px;color:var(--primary);text-align:center}
 
-    /* ====== Modales ====== */
-    #modal,#modalVer {
-      display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
-      justify-content:center; align-items:center; padding:20px; z-index:10;
-    }
-    #modal .content,#modalVer .content {
-      background:#fff; padding:16px 16px 22px; border-radius:var(--radius);
-      max-width:980px; width:100%; max-height:90vh; overflow:auto; box-shadow:var(--shadow);
-    }
-    #verContenido p { margin:.35rem 0; font-size:.92rem; }
-    #verContenido strong { color:var(--primary); }
+    .container{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+    .main{min-width:0}
+    .sidebar{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;position:sticky;top:14px}
 
-    /* ====== Estilos del FORM (tal cual form.html) ====== */
-    :root {
-      --form-bg: #f4f7fa;
-      --form-card: #fff;
-      --form-primary: #1f3a93;
-      --form-accent: #e74c3c;
-      --form-text: #2c3e50;
-      --form-muted: #7f8c8d;
-      --form-radius: 10px;
-      --form-transition: .3s;
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:12px 0}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input[type="text"], select.simple{
+      padding:8px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:.9rem
     }
-    form#formCausa {
-      background: var(--form-card);
-      padding: 18px;
-      border-radius: var(--form-radius);
-      box-shadow: var(--shadow);
-      margin: 0 auto;
+
+    .btn{border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:.2s}
+    .btn:hover{opacity:.9}
+    .btn-nuevo{background:var(--accent);color:#fff}
+    .btn-print{background:var(--success);color:#fff}
+    .btn-edit{background:var(--warning);color:#fff}
+    .btn-delete{background:var(--danger);color:#fff}
+    .btn-view{background:var(--primary);color:#fff}
+    .btn-ghost{background:#eef2f7;color:#2c3e50}
+
+    /* Tabs */
+    .tabs{display:flex;gap:8px;margin-bottom:10px}
+    .tab{padding:8px 12px;border-radius:8px;background:#eef2f7;cursor:pointer;font-size:.88rem}
+    .tab.active{background:var(--primary);color:#fff}
+    .tab-note{font-size:.8rem;color:var(--muted);margin-left:6px}
+
+    /* Tablas */
+    .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:720px}
+    th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:.9rem}
+    th{background:var(--primary);color:#fff;position:sticky;top:0;z-index:1}
+    tr:hover td{background:#f9fbff}
+    .nowrap{white-space:nowrap}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+
+    /* Sidebar */
+    .sidebar h2{margin:0 0 10px;font-size:1.05rem;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:6px}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--tag);font-size:.75rem;margin-left:6px}
+    .group{margin-bottom:12px}
+    .event{display:flex;gap:8px;align-items:flex-start;background:#f9f9ff;border-left:4px solid var(--accent);padding:6px 8px;border-radius:6px;margin:6px 0}
+    .event .when{font-weight:600}
+    .k{color:#6b7280}
+
+    /* Modales */
+    #modal,#modalVer{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+      justify-content:center;align-items:center;padding:20px;z-index:10
     }
-    #tituloForm {
-      margin: 0 0 10px;
-      font-size: 1.2rem;
-      color: var(--form-primary);
-      text-align: left;
+    #modal .content,#modalVer .content{
+      background:#fff;padding:16px 16px 22px;border-radius:var(--radius);
+      max-width:980px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow)
     }
-    .grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
+    #verContenido p{margin:.35rem 0;font-size:.92rem}
+    #verContenido strong{color:var(--primary)}
+
+    /* ====== Estilos del FORM (idéntico a tu versión) ====== */
+    :root{
+      --form-bg:#f4f7fa; --form-card:#fff; --form-primary:#1f3a93; --form-accent:#e74c3c;
+      --form-text:#2c3e50; --form-muted:#7f8c8d; --form-radius:10px; --form-transition:.3s;
     }
-    .field { display:flex; flex-direction:column; }
-    .field label { font-size:.85rem; color:var(--form-text); margin-bottom:6px; font-weight:600; }
-    .field input, .field select, .field textarea {
-      padding:10px; border:1px solid #dcdde1; border-radius:8px; font-size:.92rem; background:#fafafa;
-      transition: border var(--form-transition), background var(--form-transition);
+    form#formCausa{background:var(--form-card);padding:18px;border-radius:var(--form-radius);box-shadow:var(--shadow);margin:0 auto}
+    #tituloForm{margin:0 0 10px;font-size:1.2rem;color:var(--form-primary);text-align:left}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+    .field{display:flex;flex-direction:column}
+    .field label{font-size:.85rem;color:var(--form-text);margin-bottom:6px;font-weight:600}
+    .field input,.field select,.field textarea{
+      padding:10px;border:1px solid #dcdde1;border-radius:8px;font-size:.92rem;background:#fafafa;
+      transition:border var(--form-transition), background var(--form-transition)
     }
-    .field input:focus, .field select:focus, .field textarea:focus { outline:none; border-color:var(--form-primary); background:#fff; }
-    textarea { resize:vertical; min-height:70px; }
-    .inline { display:flex; gap:8px; align-items:center; }
-    .counter { font-size:.75rem; color:var(--form-muted); text-align:right; }
-    .hidden { display:none; }
-    .required-asterisk { color:red; font-weight:700; margin-left:4px; cursor:help; }
-    .controls-form { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:14px; }
-    .btn-add { background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
-    .btn-delete { background:var(--danger); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
-    .btn-add:hover, .btn-delete:hover { opacity:.9; }
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--form-primary);background:#fff}
+    textarea{resize:vertical;min-height:70px}
+    .inline{display:flex;gap:8px;align-items:center}
+    .counter{font-size:.75rem;color:var(--form-muted);text-align:right}
+    .hidden{display:none}
+    .required-asterisk{color:red;font-weight:700;margin-left:4px;cursor:help}
+    .controls-form{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}
+    .btn-add{background:var(--success);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .btn-delete{background:var(--danger);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .btn-add:hover,.btn-delete:hover{opacity:.9}
   </style>
 </head>
 <body>
@@ -113,46 +106,100 @@
           <input type="text" id="buscador" placeholder="🔍 Buscar..." />
           <select id="filtroEstado" class="simple">
             <option value="">Estado (todos)</option>
-            <option>En trámite</option>
-            <option>Finalizado</option>
-            <option>En Alzada</option>
-            <option>Archivado</option>
+            <option>En trámite</option><option>Finalizado</option><option>En Alzada</option><option>Archivado</option>
           </select>
           <select id="filtroUsuario" class="simple">
             <option value="">Usuario (todos)</option>
           </select>
         </div>
-        <div class="actions">
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="btnToggleVista" class="btn btn-ghost">↔️ Vista completa</button>
           <button id="btnNuevo" class="btn btn-nuevo">➕ Nuevo Registro</button>
           <button id="btnPrintListado" class="btn btn-print">🖨️ Imprimir Listado</button>
         </div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Usuario</th><th>Estado</th><th>Registro</th><th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyCausas"><tr><td colspan="8">Cargando...</td></tr></tbody>
-      </table>
+      <div class="tabs">
+        <div id="tabCompacta" class="tab active">Vista compacta</div>
+        <div id="tabCompleta" class="tab">Vista completa <span class="tab-note">todas las columnas</span></div>
+      </div>
+
+      <!-- Vista COMPACTA -->
+      <div id="wrapCompacta" class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="nowrap">N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Usuario</th><th>Estado</th><th class="nowrap">Registro</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyCausas"><tr><td colspan="8">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- Vista COMPLETA (todas las columnas) -->
+      <div id="wrapCompleta" class="table-wrap" style="display:none;margin-top:10px">
+        <table>
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Carátula</th>
+              <th>Tipo</th>
+              <th>Juzgado</th>
+              <th>Fecha Inicio</th>
+              <th>Fecha Pase</th>
+              <th>Intervención</th>
+              <th>Datos NNyA</th>
+              <th>Audiencias</th>
+              <th>Vencimiento</th>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Recurso</th>
+              <th>Rec. Contestación</th>
+              <th>Estado Recursos</th>
+              <th>Venc. Recursos</th>
+              <th>Aud. Gesell</th>
+              <th>NNyA Gesell</th>
+              <th>Observaciones</th>
+              <th>Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyCompleto"><tr><td colspan="21">Cargando...</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="sidebar">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
       <h2>📅 Próximas Fechas (30 días)</h2>
-      <ul id="listaFechas"><li>Cargando...</li></ul>
-      <button id="btnPrintFechas" class="btn btn-print" style="margin-top:8px;">🖨️ Imprimir Fechas</button>
-    </div>
+      <div class="group">
+        <div class="k">Audiencias <span class="pill" id="countAud">0</span></div>
+        <div id="listAud"></div>
+      </div>
+      <div class="group">
+        <div class="k">Cámara Gesell <span class="pill" id="countGesell">0</span></div>
+        <div id="listGesell"></div>
+      </div>
+      <div class="group">
+        <div class="k">Vencimientos <span class="pill" id="countVenc">0</span></div>
+        <div id="listVenc"></div>
+      </div>
+      <div class="group">
+        <div class="k">Venc. de Recursos <span class="pill" id="countVrec">0</span></div>
+        <div id="listVrec"></div>
+      </div>
+      <button id="btnPrintFechas" class="btn btn-print" style="margin-top:8px;width:100%">🖨️ Imprimir Fechas</button>
+    </aside>
   </div>
 
-  <!-- ===== Modal con el FORM tal cual tu form.html ===== -->
+  <!-- ===== Modal con el FORM (sin cambios) ===== -->
   <div id="modal">
     <div class="content">
+      <!-- *** FORM MANTENIDO COMO EN TU ARCHIVO *** -->
       <form id="formCausa" action="#" method="post" aria-label="Formulario para nuevo expediente o edición">
         <h2 id="tituloForm">Nuevo Expediente</h2>
         <input type="hidden" id="editId" />
         <div class="grid">
-
           <!-- Campos principales -->
           <div class="field">
             <label for="numCausa">N° Expediente <span class="required-asterisk">*</span></label>
@@ -309,7 +356,7 @@
       <h2>Detalle del Expediente</h2>
       <div id="verContenido"></div>
       <div class="controls-form" style="justify-content:flex-end;">
-        <button id="btnCerrarVer" class="btn btn-cancel">Cerrar</button>
+        <button id="btnCerrarVer" class="btn btn-ghost">Cerrar</button>
         <button id="btnPrintRegistro" class="btn btn-print">🖨️ Imprimir Registro</button>
       </div>
     </div>
@@ -336,7 +383,7 @@
 
     /* ===== Referencias UI ===== */
     const tbody = document.getElementById("tbodyCausas");
-    const listaFechas = document.getElementById("listaFechas");
+    const tbodyCompleto = document.getElementById("tbodyCompleto");
     const modal = document.getElementById("modal");
     const modalVer = document.getElementById("modalVer");
     const verContenido = document.getElementById("verContenido");
@@ -346,8 +393,34 @@
     const filtroEstado = document.getElementById("filtroEstado");
     const filtroUsuario = document.getElementById("filtroUsuario");
 
+    // Sidebar refs
+    const listAud = document.getElementById("listAud");
+    const listGes = document.getElementById("listGesell");
+    const listVenc = document.getElementById("listVenc");
+    const listVrec = document.getElementById("listVrec");
+    const cAud = document.getElementById("countAud");
+    const cGes = document.getElementById("countGesell");
+    const cVenc = document.getElementById("countVenc");
+    const cVrec = document.getElementById("countVrec");
+
+    // Tabs / toggle
+    const tabCompacta = document.getElementById("tabCompacta");
+    const tabCompleta = document.getElementById("tabCompleta");
+    const wrapCompacta = document.getElementById("wrapCompacta");
+    const wrapCompleta = document.getElementById("wrapCompleta");
+    const btnToggleVista = document.getElementById("btnToggleVista");
+
     /* ===== Util ===== */
-    const fmt = d => d ? new Date(d.seconds ? d.seconds*1000 : d).toLocaleString() : "";
+    const fmt = d => {
+      if(!d) return "";
+      const date = d.seconds ? new Date(d.seconds*1000) : new Date(d);
+      return date.toLocaleString();
+    };
+    const fmtShort = d => {
+      if(!d) return "";
+      const date = d.seconds ? new Date(d.seconds*1000) : new Date(d);
+      return date.toLocaleDateString()+" "+date.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    };
     const isDateField = id => ([
       "fechaInicio","fechaPase","audiencias","vencimiento",
       "vencimientoRecursos","audienciaGesell"
@@ -362,25 +435,46 @@
       const arr = [];
       snap.forEach(d => arr.push({ id:d.id, ...d.data() }));
       datosCache = arr;
-      renderTabla(filtrarDatos());
-      renderFechas(arr);
+      renderTablas(filtrarDatos());
+      renderSidebar(arr);
       poblarFiltroUsuarios(arr);
     });
 
-    /* ===== Render listado ===== */
-    function renderTabla(data){
+    /* ===== Búsqueda / Filtros ===== */
+    function filtrarDatos(){
+      const q = (buscador.value||"").toLowerCase();
+      const est = (filtroEstado.value||"").toLowerCase();
+      const usu = (filtroUsuario.value||"").toLowerCase();
+      return datosCache.filter(d=>{
+        const texto = [
+          d.numCausa,d.caratula,d.tipoProceso,d.juzgado,d.usuarioAsignado,d.estado,
+          d.intervencion,d.recursos,d.recursosContestacion,d.estadoRecursos
+        ].map(x=>(x||"").toString().toLowerCase()).join(" ");
+        const okTexto = !q || texto.includes(q);
+        const okEstado = !est || (d.estado||"").toLowerCase()===est;
+        const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase()===usu;
+        return okTexto && okEstado && okUsuario;
+      });
+    }
+    buscador.oninput = ()=>renderTablas(filtrarDatos());
+    filtroEstado.onchange = ()=>renderTablas(filtrarDatos());
+    filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
+
+    /* ===== Render tablas ===== */
+    function renderTablas(data){
+      // Compacta
       tbody.innerHTML = data.length ? "" : "<tr><td colspan='8'>No hay registros</td></tr>";
       data.forEach(d => {
         tbody.insertAdjacentHTML("beforeend", `
           <tr>
-            <td>${d.numCausa||""}</td>
+            <td class="mono">${d.numCausa||""}</td>
             <td>${d.caratula||""}</td>
             <td>${d.tipoProceso||""}</td>
             <td>${d.juzgado||""}</td>
             <td>${d.usuarioAsignado||""}</td>
             <td>${d.estado||""}</td>
-            <td>${fmt(d.fechaRegistro)}</td>
-            <td>
+            <td class="nowrap">${fmt(d.fechaRegistro)}</td>
+            <td class="nowrap">
               <button class="btn-view" data-id="${d.id}">👁️</button>
               <button class="btn-edit" data-id="${d.id}">✏️</button>
               <button class="btn-delete" data-id="${d.id}">🗑️</button>
@@ -388,25 +482,97 @@
           </tr>
         `);
       });
+
+      // Completa (todas las columnas)
+      tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='21'>No hay registros</td></tr>";
+      data.forEach(d=>{
+        tbodyCompleto.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td class="mono">${d.numCausa||""}</td>
+            <td>${d.caratula||""}</td>
+            <td>${d.tipoProceso||""}</td>
+            <td>${d.juzgado||""}</td>
+            <td>${fmt(d.fechaInicio)}</td>
+            <td>${fmt(d.fechaPase)}</td>
+            <td>${d.intervencion||""}</td>
+            <td>${d.datosNnya||""}</td>
+            <td>${fmt(d.audiencias)}</td>
+            <td>${fmt(d.vencimiento)}</td>
+            <td>${d.usuarioAsignado||""}</td>
+            <td>${d.estado||""}</td>
+            <td>${d.recursos||""}</td>
+            <td>${d.recursosContestacion||""}</td>
+            <td>${d.estadoRecursos||""}</td>
+            <td>${fmt(d.vencimientoRecursos)}</td>
+            <td>${fmt(d.audienciaGesell)}</td>
+            <td>${d.nnyaGesell||""}</td>
+            <td>${d.observaciones||""}</td>
+            <td>${fmt(d.fechaRegistro)}</td>
+            <td class="nowrap">
+              <button class="btn-view" data-id="${d.id}">👁️</button>
+              <button class="btn-edit" data-id="${d.id}">✏️</button>
+              <button class="btn-delete" data-id="${d.id}">🗑️</button>
+            </td>
+          </tr>
+        `);
+      });
+
+      // Bind acciones
       document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
       document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
       document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>eliminar(b.dataset.id));
     }
 
-    function renderFechas(data){
-      listaFechas.innerHTML = "";
-      let hoy = new Date(), limite = new Date(); limite.setDate(hoy.getDate()+30);
-      const fechas = [];
-      data.forEach(d => {
-        const f = d.fechaInicio?.seconds ? new Date(d.fechaInicio.seconds*1000) : null;
-        if (f && f>=hoy && f<=limite) fechas.push({ f, c:d.numCausa });
+    /* ===== Sidebar (audiencias, gesell, vencimientos y venc. recursos) ===== */
+    function renderSidebar(data){
+      // ventana de 30 días
+      const hoy = new Date();
+      const limite = new Date(); limite.setDate(hoy.getDate()+30);
+
+      const eventos = {
+        aud: [],       // audiencias
+        ges: [],       // gesell
+        venc: [],      // vencimientos
+        vrec: []       // vencimientos de recursos
+      };
+
+      const pushIfRange = (arr, fecha, label)=>{
+        if(!fecha) return;
+        const f = fecha.seconds ? new Date(fecha.seconds*1000) : new Date(fecha);
+        if(isNaN(f)) return;
+        if(f>=hoy && f<=limite) arr.push({f, label});
+      };
+
+      data.forEach(d=>{
+        const id = d.numCausa || d.id;
+        pushIfRange(eventos.aud, d.audiencias, `${id}`);
+        pushIfRange(eventos.ges, d.audienciaGesell, `${id}`);
+        pushIfRange(eventos.venc, d.vencimiento, `${id}`);
+        pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} — ${d.recursos||'Recurso'}`);
       });
-      if (!fechas.length){ listaFechas.innerHTML = "<li>No hay fechas próximas</li>"; return; }
-      fechas.sort((a,b)=>a.f-b.f).forEach(e=>{
-        listaFechas.insertAdjacentHTML("beforeend", `<li><strong>${fmt(e.f)}</strong> — ${e.c}</li>`);
-      });
+
+      const renderList = (arr, target, counterRef, empty="No hay fechas próximas")=>{
+        arr.sort((a,b)=>a.f-b.f);
+        target.innerHTML = "";
+        if(!arr.length){ target.innerHTML = `<div class="k">${empty}</div>`; counterRef.textContent = "0"; return; }
+        counterRef.textContent = String(arr.length);
+        arr.forEach(e=>{
+          target.insertAdjacentHTML("beforeend", `
+            <div class="event">
+              <div class="when">${fmtShort(e.f)}</div>
+              <div class="what">— ${e.label}</div>
+            </div>
+          `);
+        });
+      };
+
+      renderList(eventos.aud, listAud, cAud);
+      renderList(eventos.ges, listGes, cGes);
+      renderList(eventos.venc, listVenc, cVenc);
+      renderList(eventos.vrec, listVrec, cVrec);
     }
 
+    /* ===== Poblado de filtro Usuarios ===== */
     function poblarFiltroUsuarios(data){
       const set = new Set([""]);
       data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
@@ -420,25 +586,6 @@
       filtroUsuario.value = current || "";
     }
 
-    function filtrarDatos(){
-      const q = (buscador.value||"").toLowerCase();
-      const est = (filtroEstado.value||"").toLowerCase();
-      const usu = (filtroUsuario.value||"").toLowerCase();
-      return datosCache.filter(d=>{
-        const texto = [
-          d.numCausa,d.caratula,d.tipoProceso,d.juzgado,d.usuarioAsignado,d.estado
-        ].map(x=>(x||"").toString().toLowerCase()).join(" ");
-        const okTexto = !q || texto.includes(q);
-        const okEstado = !est || (d.estado||"").toLowerCase()===est;
-        const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase()===usu;
-        return okTexto && okEstado && okUsuario;
-      });
-    }
-
-    buscador.oninput = ()=>renderTabla(filtrarDatos());
-    filtroEstado.onchange = ()=>renderTabla(filtrarDatos());
-    filtroUsuario.onchange = ()=>renderTabla(filtrarDatos());
-
     /* ===== Nuevo registro ===== */
     document.getElementById("btnNuevo").onclick = ()=>{
       modo = "nuevo";
@@ -448,7 +595,7 @@
       modal.style.display = "flex";
     };
 
-    /* ===== Guardar (usa el botón del propio form) ===== */
+    /* ===== Guardar ===== */
     document.getElementById("btnGuardar").onclick = async ()=>{
       const datos = recolectarDatosForm();
       if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) {
@@ -470,7 +617,7 @@
       }
     };
 
-    /* ===== Editar ===== */
+    /* ===== Editar / Eliminar / Ver ===== */
     async function abrirEditar(id){
       modo = "editar";
       resetFormCausa();
@@ -483,14 +630,12 @@
       modal.style.display = "flex";
     }
 
-    /* ===== Eliminar ===== */
     async function eliminar(id){
       if (confirm("¿Eliminar registro?")) {
         await deleteDoc(doc(db,"causas",id));
       }
     }
 
-    /* ===== Ver ===== */
     async function abrirVer(id){
       const d = (await getDoc(doc(db,"causas",id))).data();
       const pares = Object.entries(d).filter(([k,v])=>v);
@@ -503,18 +648,30 @@
     document.getElementById("btnCerrarVer").onclick = ()=>modalVer.style.display="none";
 
     /* ===== Imprimir ===== */
-    const printSection = (id)=>{
-      const c = document.getElementById(id);
+    const printSection = (html)=>{
       const w = window.open("","_blank","width=900,height=700");
-      w.document.write(`<html><head><title>Imprimir</title></head><body>${c.innerHTML}</body></html>`);
+      w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`);
       w.document.close(); w.focus(); w.print();
     };
-    document.getElementById("btnPrintListado").onclick = ()=>printSection("tbodyCausas");
-    document.getElementById("btnPrintFechas").onclick = ()=>printSection("listaFechas");
-    document.getElementById("btnPrintForm").onclick = ()=>printSection("formCausa");
-    document.getElementById("btnPrintRegistro").onclick = ()=>printSection("verContenido");
+    document.getElementById("btnPrintListado").onclick = ()=>{
+      const active = wrapCompleta.style.display!=="none" ? tbodyCompleto : tbody;
+      const head = active.closest("table").querySelector("thead").outerHTML;
+      const body = active.outerHTML;
+      printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`);
+    };
+    document.getElementById("btnPrintFechas").onclick = ()=>{
+      const html = `
+        <h3>Audiencias</h3>${listAud.outerHTML}
+        <h3>Cámara Gesell</h3>${listGes.outerHTML}
+        <h3>Vencimientos</h3>${listVenc.outerHTML}
+        <h3>Venc. de Recursos</h3>${listVrec.outerHTML}
+      `;
+      printSection(html);
+    };
+    document.getElementById("btnPrintForm").onclick = ()=>printSection(document.getElementById("formCausa").outerHTML);
+    document.getElementById("btnPrintRegistro").onclick = ()=>printSection(document.getElementById("verContenido").outerHTML);
 
-    /* ===== Lógica propia del form.html (tal cual, pero integrada) ===== */
+    /* ===== Lógica del form (idéntica a la tuya, integrada) ===== */
     const juzgadosPorTipo = {
       Administrativo: ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
       Civil: ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 1 - Oberá","Juzgado Civil y Comercial N° 2 - Oberá","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
@@ -534,37 +691,16 @@
     const selUsu = document.getElementById("usuarioAsignado");
 
     function initForm(){
-      // Tipo de proceso
       const tipos = ["Administrativo","Civil","Penal","Laboral","Familia","Violencia Familiar","Paz"];
-      selTipo.innerHTML = "";
-      tipos.forEach(t => {
-        let opt = document.createElement("option");
-        opt.value = t; opt.textContent = t; selTipo.appendChild(opt);
-      });
-      // Usuarios
-      selUsu.innerHTML = "";
-      usuarios.forEach(u=>{
-        let opt = document.createElement("option");
-        opt.value = u; opt.textContent = u; selUsu.appendChild(opt);
-      });
-      selTipo.value = "Administrativo";
-      actualizarJuzgados();
-
-      // Estado inicial de Gesell
-      toggleGesell(false);
-      document.getElementById("habilitarAudienciaGesell").checked = false;
+      selTipo.innerHTML = ""; tipos.forEach(t=>{let o=document.createElement("option");o.value=t;o.textContent=t;selTipo.appendChild(o);});
+      selUsu.innerHTML = ""; usuarios.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=u;selUsu.appendChild(o);});
+      selTipo.value = "Administrativo"; actualizarJuzgados();
+      toggleGesell(false); document.getElementById("habilitarAudienciaGesell").checked = false;
     }
-
     function actualizarJuzgados(){
-      const tipo = selTipo.value;
-      const juzgados = juzgadosPorTipo[tipo] || [];
-      selJuz.innerHTML = "";
-      juzgados.forEach(j=>{
-        let opt = document.createElement("option");
-        opt.value = j; opt.textContent = j; selJuz.appendChild(opt);
-      });
+      const tipo = selTipo.value; const j = juzgadosPorTipo[tipo]||[];
+      selJuz.innerHTML=""; j.forEach(x=>{let o=document.createElement("option");o.value=x;o.textContent=x;selJuz.appendChild(o);});
     }
-
     selTipo.addEventListener("change", actualizarJuzgados);
 
     // Datos NNyA habilitados solo si Ministerio Complementario
@@ -572,16 +708,12 @@
       const datosNnya = document.getElementById("datosNnya");
       const contadorNnya = document.getElementById("counterNnya");
       if (this.value === "Ministerio Complementario") {
-        datosNnya.removeAttribute("disabled");
-        contadorNnya.classList.remove("hidden");
+        datosNnya.removeAttribute("disabled"); contadorNnya.classList.remove("hidden");
       } else {
-        datosNnya.value = "";
-        datosNnya.setAttribute("disabled", "true");
-        contadorNnya.classList.add("hidden");
+        datosNnya.value = ""; datosNnya.setAttribute("disabled","true"); contadorNnya.classList.add("hidden");
       }
     });
 
-    // Contadores
     const limitWords = (text, max) => {
       const words = text.trim().split(/\s+/).filter(Boolean);
       if (words.length > max) return words.slice(0,max).join(" ");
@@ -600,7 +732,6 @@
       document.getElementById("counterNnyaGesell").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/400`;
     });
 
-    // Habilitar Gesell
     document.getElementById("habilitarAudienciaGesell").addEventListener("change", function(){
       toggleGesell(this.checked);
     });
@@ -608,29 +739,23 @@
       const ag = document.getElementById("audienciaGesell");
       const ng = document.getElementById("nnyaGesell");
       if (enabled) {
-        ag.removeAttribute("disabled");
-        ng.removeAttribute("disabled");
+        ag.removeAttribute("disabled"); ng.removeAttribute("disabled");
         document.getElementById("counterNnyaGesell").classList.remove("hidden");
       } else {
-        ag.value = "";
-        ng.value = "";
-        ag.setAttribute("disabled","true");
-        ng.setAttribute("disabled","true");
+        ag.value = ""; ng.value = "";
+        ag.setAttribute("disabled","true"); ng.setAttribute("disabled","true");
         document.getElementById("counterNnyaGesell").classList.add("hidden");
       }
     }
 
-    // Reset/Inicialización al abrir modal
     function resetFormCausa(){
       document.getElementById("formCausa").reset();
       initForm();
-      // Counters visibles según estado
       document.getElementById("counter").textContent = "0/1000";
       document.getElementById("counterNnya").textContent = "0/500";
       document.getElementById("counterNnyaGesell").textContent = "0/400";
     }
 
-    // Recolectar datos del form (con conversión de fechas)
     function recolectarDatosForm(){
       const fields = [
         "numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase",
@@ -644,13 +769,12 @@
         const el = document.getElementById(id);
         if (!el) return;
         let val = el.value;
-        if (isDateField(id)) datos[id] = val ? new Date(val) : null;
+        if (["date","datetime-local"].includes(el.type)) datos[id] = val ? new Date(val) : null;
         else datos[id] = val || "";
       });
       return datos;
     }
 
-    // Cargar datos al form (desde Firestore)
     function cargarDatosEnForm(d){
       const setVal = (id, val)=>{
         const el = document.getElementById(id); if(!el) return;
@@ -663,44 +787,50 @@
           el.value = val ?? "";
         }
       };
-
       initForm();
-      // Asegurar que juzgado corresponda al tipoProceso actual
       if (d.tipoProceso){ selTipo.value = d.tipoProceso; actualizarJuzgados(); }
 
       [
-        "numCausa","caratula","tipoProceso","juzgado",
-        "intervencion","datosNnya","usuarioAsignado","estado",
-        "recursos","recursosContestacion","estadoRecursos","nnyaGesell","observaciones"
+        "numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya",
+        "usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos",
+        "nnyaGesell","observaciones"
       ].forEach(k=> setVal(k, d[k]));
 
       ["fechaInicio","fechaPase","audiencias","vencimiento","vencimientoRecursos","audienciaGesell"]
         .forEach(k=> setVal(k, d[k]));
 
-      // Gesell habilitado si había datos
       const habilitar = !!(d.audienciaGesell || d.nnyaGesell);
       document.getElementById("habilitarAudienciaGesell").checked = habilitar;
       toggleGesell(habilitar);
     }
 
-    // Cerrar modal clic fuera
+    // Cerrar modales clic fuera
     window.addEventListener("click", e=>{
       if (e.target === modal) modal.style.display="none";
       if (e.target === modalVer) modalVer.style.display="none";
     });
 
-    // Acciones de barra
-    document.getElementById("btnPrintRegistro").onclick = ()=>printSection("verContenido");
-    document.getElementById("btnPrintFechas").onclick = ()=>printSection("listaFechas");
-    document.getElementById("btnPrintListado").onclick = ()=>printSection("tbodyCausas");
-    document.getElementById("btnCerrarVer").onclick = ()=>modalVer.style.display="none";
+    /* ===== Tabs / Toggle de vistas ===== */
+    const activateTab = (full=false)=>{
+      if(full){
+        tabCompleta.classList.add("active"); tabCompacta.classList.remove("active");
+        wrapCompleta.style.display="block"; wrapCompacta.style.display="none";
+        btnToggleVista.textContent = "↔️ Vista compacta";
+      }else{
+        tabCompacta.classList.add("active"); tabCompleta.classList.remove("active");
+        wrapCompacta.style.display="block"; wrapCompleta.style.display="none";
+        btnToggleVista.textContent = "↔️ Vista completa";
+      }
+    };
+    tabCompacta.onclick = ()=>activateTab(false);
+    tabCompleta.onclick = ()=>activateTab(true);
+    btnToggleVista.onclick = ()=>activateTab(wrapCompacta.style.display!=="none");
 
-    // Prefill inicial de filtros de usuarios (vacío)
+    // Prefill inicial filtro usuarios
     poblarFiltroUsuarios([]);
 
-    // Botón Cerrar (x) equivalente
+    // Botón cerrar modal (si existiera en futuras versiones)
     document.getElementById("btnCerrarModal")?.addEventListener("click", ()=> modal.style.display="none");
   </script>
 </body>
 </html>
-
