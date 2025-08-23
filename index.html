@@ -3,31 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Administracion de Causas</title>
+  <title>Causas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    /* ====== Estilos generales ====== */
     :root{
       --bg:#f5f7fb; --card:#fff; --primary:#1f3a93; --accent:#3498db;
       --danger:#e74c3c; --success:#27ae60; --warning:#f39c12; --muted:#7f8c8d;
-      --radius:12px; --shadow:0 4px 15px rgba(0,0,0,.08);
-      --tag:#eef2ff;
+      --radius:12px; --shadow:0 4px 15px rgba(0,0,0,.08); --tag:#eef2ff;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#2c3e50;padding:20px}
     h1{margin:0 0 12px;color:var(--primary);text-align:center}
 
-    .container{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+    .container{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
     .main{min-width:0}
     .sidebar{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;position:sticky;top:14px}
+    .sidebar h2{margin:0 0 10px;font-size:1.05rem;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:6px}
 
     .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:12px 0}
     .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input[type="text"], select.simple{
-      padding:8px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:.9rem
-    }
+    input[type="text"], select.simple{padding:8px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:.9rem}
 
-    .btn{border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.9rem;transition:.2s;white-space:nowrap;line-height:1.2}
-    .btn:hover{opacity:.9}
+    .btn{border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.92rem;transition:.2s;white-space:nowrap;line-height:1.2;display:inline-flex;align-items:center;gap:8px}
+    .btn:hover{opacity:.95}
     .btn-nuevo{background:var(--accent);color:#fff}
     .btn-print{background:var(--success);color:#fff}
     .btn-edit{background:var(--warning);color:#fff}
@@ -35,17 +33,12 @@
     .btn-view{background:var(--primary);color:#fff}
     .btn-ghost{background:#eef2f7;color:#2c3e50}
 
-    /* Tabs */
     .tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
     .tab{padding:8px 12px;border-radius:8px;background:#eef2f7;cursor:pointer;font-size:.88rem}
     .tab.active{background:var(--primary);color:#fff}
     .tab-note{font-size:.8rem;color:var(--muted);margin-left:6px}
 
-    /* Tablas */
-    .table-wrap{
-      background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
-      overflow:auto;-webkit-overflow-scrolling:touch
-    }
+    .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:collapse;min-width:720px}
     th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:.9rem;vertical-align:top;word-break:break-word}
     th{background:var(--primary);color:#fff;position:sticky;top:0;z-index:1}
@@ -53,84 +46,41 @@
     .nowrap{white-space:nowrap}
     .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
 
-    /* Sidebar */
-    .sidebar h2{margin:0 0 10px;font-size:1.05rem;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:6px}
     .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--tag);font-size:.75rem;margin-left:6px}
     .group{margin-bottom:12px}
     .event{display:flex;gap:8px;align-items:flex-start;background:#f9f9ff;border-left:4px solid var(--accent);padding:6px 8px;border-radius:6px;margin:6px 0}
     .event .when{font-weight:600}
     .k{color:#6b7280}
 
-    /* Modales */
-    #modal,#modalVer{
-      display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
-      justify-content:center;align-items:center;padding:20px;z-index:10
-    }
-    #modal .content,#modalVer .content{
-      background:#fff;padding:16px 16px 22px;border-radius:var(--radius);
-      max-width:980px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow)
-    }
+    #modal,#modalVer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:10}
+    #modal .content,#modalVer .content{background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 25px rgba(0,0,0,0.2);animation:fadeIn .25s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* sticky areas */
+    .modal-header{position:sticky;top:0;background:var(--primary);color:#fff;padding:12px 16px;font-size:1.1rem;font-weight:600;border-radius:16px 16px 0 0;z-index:5;display:flex;align-items:center;gap:10px;justify-content:center}
+    .modal-body{padding:16px 16px 0;overflow-y:auto}
+    .controls-form{position:sticky;bottom:0;background:#fff;padding:12px 16px;border-top:1px solid #eee;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;z-index:5}
+
+    /* form */
+    #formCausa .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:900px){ #formCausa .grid{grid-template-columns:1fr} .container{grid-template-columns:1fr} .sidebar{position:relative;top:auto} }
+    #formCausa label{font-weight:600;color:var(--primary);font-size:0.9rem;margin-bottom:4px;display:block}
+    #formCausa input,#formCausa textarea,#formCausa select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:0.9rem;background:#fafafa;transition:.2s}
+    #formCausa input:focus,#formCausa textarea:focus,#formCausa select:focus{outline:none;border-color:var(--accent);background:#fff}
+    .counter{font-size:.8rem;color:#6b7280;margin-top:4px}
+
+    /* view modal content */
     #verContenido p{margin:.35rem 0;font-size:.92rem}
     #verContenido strong{color:var(--primary)}
+    .note{border-left:3px solid #3498db;padding:6px;margin:6px 0;background:#f9fbff;border-radius:6px}
 
-    /* ====== Estilos del FORM (idéntico a tu versión) ====== */
-    :root{
-      --form-bg:#f4f7fa; --form-card:#fff; --form-primary:#1f3a93; --form-accent:#e74c3c;
-      --form-text:#2c3e50; --form-muted:#7f8c8d; --form-radius:10px; --form-transition:.3s;
-    }
-    form#formCausa{background:var(--form-card);padding:18px;border-radius:var(--form-radius);box-shadow:var(--shadow);margin:0 auto}
-    #tituloForm{margin:0 0 10px;font-size:1.2rem;color:var(--form-primary);text-align:left}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-    .field{display:flex;flex-direction:column}
-    .field label{font-size:.85rem;color:var(--form-text);margin-bottom:6px;font-weight:600}
-    .field input,.field select,.field textarea{
-      padding:10px;border:1px solid #dcdde1;border-radius:8px;font-size:.92rem;background:#fafafa;
-      transition:border var(--form-transition), background var(--form-transition)
-    }
-    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--form-primary);background:#fff}
-    textarea{resize:vertical;min-height:70px}
-    .inline{display:flex;gap:8px;align-items:center}
-    .counter{font-size:.75rem;color:var(--form-muted);text-align:right}
-    .hidden{display:none}
-    .required-asterisk{color:red;font-weight:700;margin-left:4px;cursor:help}
-    .controls-form{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}
-    .btn-add{background:var(--success);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
-    .btn-delete{background:var(--danger);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
-    .btn-add:hover,.btn-delete:hover{opacity:.9}
-
-    /* ====== Accesibilidad mínima ====== */
-    :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
-
-    /* ====== RESPONSIVE ====== */
-    /* Tablet y menores: sidebar bajo la tabla, 1 columna */
-    @media (max-width: 1024px){
-      .container{grid-template-columns:1fr}
-      .sidebar{position:relative;top:unset;order:-1}
-    }
-    /* Tablet angosta y móviles: apilar filtros/botones y dar ancho completo */
-    @media (max-width: 768px){
-      body{padding:12px}
-      .top-actions{flex-direction:column;align-items:stretch}
-      .filters{width:100%}
-      .filters input[type="text"], .filters select.simple{flex:1;min-width:160px}
-      .actions{display:flex;gap:8px;flex-wrap:wrap;width:100%}
-      .btn{flex:1;text-align:center}
-      .tabs{gap:6px}
-      #modal .content,#modalVer .content{max-width:100%;border-radius:10px}
-    }
-    /* Móviles chicos */
-    @media (max-width: 480px){
-      h1{font-size:1.25rem}
-      .tab{flex:1;text-align:center;padding:10px}
-      table{min-width:600px} /* scroll horizontal suave en móviles */
-      th,td{padding:8px}
-      .controls-form{flex-direction:column}
-      .btn{width:100%}
-    }
+    /* action buttons row */
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .top-actions .actions .btn{display:flex;align-items:center}
   </style>
 </head>
 <body>
-    <div class="container">
+  <div class="container">
     <div class="main">
       <div class="top-actions">
         <div class="filters">
@@ -143,10 +93,10 @@
             <option value="">Usuario (todos)</option>
           </select>
         </div>
-        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="btnToggleVista" class="btn btn-ghost">↔️ Vista completa</button>
-          <button id="btnNuevo" class="btn btn-nuevo">➕ Nuevo Registro</button>
-          <button id="btnPrintListado" class="btn btn-print">🖨️ Imprimir Listado</button>
+        <div class="actions">
+          <button id="btnToggleVista" class="btn btn-ghost"><i class="fa-solid fa-arrows-left-right"></i>Vista completa</button>
+          <button id="btnNuevo" class="btn btn-nuevo"><i class="fa fa-plus"></i>Nuevo Expediente</button>
+          <button id="btnPrintListado" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Listado</button>
         </div>
       </div>
 
@@ -155,7 +105,6 @@
         <div id="tabCompleta" class="tab">Vista completa <span class="tab-note">todas las columnas</span></div>
       </div>
 
-      <!-- Vista COMPACTA -->
       <div id="wrapCompacta" class="table-wrap">
         <table>
           <thead>
@@ -167,32 +116,11 @@
         </table>
       </div>
 
-      <!-- Vista COMPLETA (todas las columnas) -->
       <div id="wrapCompleta" class="table-wrap" style="display:none;margin-top:10px">
         <table>
           <thead>
             <tr>
-              <th>N°</th>
-              <th>Carátula</th>
-              <th>Tipo</th>
-              <th>Juzgado</th>
-              <th>Fecha Inicio</th>
-              <th>Fecha Pase</th>
-              <th>Intervención</th>
-              <th>Datos NNyA</th>
-              <th>Audiencias</th>
-              <th>Vencimiento</th>
-              <th>Usuario</th>
-              <th>Estado</th>
-              <th>Recurso</th>
-              <th>Rec. Contestación</th>
-              <th>Estado Recursos</th>
-              <th>Venc. Recursos</th>
-              <th>Aud. Gesell</th>
-              <th>NNyA Gesell</th>
-              <th>Observaciones</th>
-              <th>Registro</th>
-              <th>Acciones</th>
+              <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Fecha Inicio</th><th>Fecha Pase</th><th>Intervención</th><th>Datos NNyA</th><th>Audiencias</th><th>Vencimiento</th><th>Usuario</th><th>Estado</th><th>Recurso</th><th>Rec. Contestación</th><th>Estado Recursos</th><th>Venc. Recursos</th><th>Aud. Gesell</th><th>NNyA Gesell</th><th>Observaciones</th><th>Registro</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tbodyCompleto"><tr><td colspan="21">Cargando...</td></tr></tbody>
@@ -200,668 +128,454 @@
       </div>
     </div>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <h2>📅 Próximas Fechas (30 días)</h2>
+      <div class="group"><div class="k">Audiencias <span class="pill" id="countAud">0</span></div><div id="listAud"></div></div>
+      <div class="group"><div class="k">Cámara Gesell <span class="pill" id="countGesell">0</span></div><div id="listGesell"></div></div>
+      <div class="group"><div class="k">Vencimientos <span class="pill" id="countVenc">0</span></div><div id="listVenc"></div></div>
+      <div class="group"><div class="k">Venc. de Recursos <span class="pill" id="countVrec">0</span></div><div id="listVrec"></div></div>
+      <button id="btnPrintFechas" class="btn btn-print" style="margin-top:8px;width:100%"><i class="fa fa-print"></i>Imprimir Fechas</button>
       <div class="group">
-        <div class="k">Audiencias <span class="pill" id="countAud">0</span></div>
-        <div id="listAud"></div>
+        <h2>📓 Seguimiento de actuaciones judiciales</h2>
+        <div id="bitacoraSidebar"><i>Seleccione una causa para ver su bitácora</i></div>
       </div>
-      <div class="group">
-        <div class="k">Cámara Gesell <span class="pill" id="countGesell">0</span></div>
-        <div id="listGesell"></div>
-      </div>
-      <div class="group">
-        <div class="k">Vencimientos <span class="pill" id="countVenc">0</span></div>
-        <div id="listVenc"></div>
-      </div>
-      <div class="group">
-        <div class="k">Venc. de Recursos <span class="pill" id="countVrec">0</span></div>
-        <div id="listVrec"></div>
-      </div>
-      <button id="btnPrintFechas" class="btn btn-print" style="margin-top:8px;width:100%">🖨️ Imprimir Fechas</button>
     </aside>
   </div>
 
-  <!-- ===== Modal con el FORM (sin cambios) ===== -->
+  <!-- Modal: ABM Causa -->
   <div id="modal">
     <div class="content">
-      <!-- *** FORM MANTENIDO COMO EN TU ARCHIVO *** -->
-      <form id="formCausa" action="#" method="post" aria-label="Formulario para nuevo expediente o edición">
-        <h2 id="tituloForm">Nuevo Expediente</h2>
-        <input type="hidden" id="editId" />
-        <div class="grid">
-          <!-- Campos principales -->
-          <div class="field">
-            <label for="numCausa">N° Expediente <span class="required-asterisk">*</span></label>
-            <input id="numCausa" name="numCausa" required autocomplete="off" />
-          </div>
-          <div class="field">
-            <label for="caratula">Carátula Completa <span class="required-asterisk">*</span></label>
-            <textarea id="caratula" name="caratula" required></textarea>
-          </div>
-          <div class="field">
-            <label for="tipoProceso">Tipo de Proceso <span class="required-asterisk">*</span></label>
-            <select id="tipoProceso" name="tipoProceso" required></select>
-          </div>
-          <div class="field">
-            <label for="juzgado">Juzgado <span class="required-asterisk">*</span></label>
-            <select id="juzgado" name="juzgado" required></select>
-          </div>
-          <div class="field">
-            <label for="fechaInicio">Fecha de Inicio</label>
-            <input type="date" id="fechaInicio" name="fechaInicio" />
-          </div>
-          <div class="field">
-            <label for="fechaPase">Fecha de Pase</label>
-            <input type="datetime-local" id="fechaPase" name="fechaPase" />
-          </div>
-
-          <!-- Intervención -->
-          <div class="field">
-            <label for="intervencion">Intervención</label>
-            <select id="intervencion" name="intervencion">
-              <option>Ministerio Complementario</option>
-              <option>Ministerio Principal</option>
-              <option>Patrocinante Actor</option>
-              <option>Patrocinante Demandado</option>
-              <option>Patrocinante Tercero</option>
-              <option value="Defensor de Ausente">Defensor de Ausente</option>
-              <option value="Defensor Oficial Asesor Letrado">Defensor Oficial Asesor Letrado</option>
-            </select>
-          </div>
-
-          <!-- Datos de NNyA -->
-          <div class="field">
-            <label for="datosNnya">Datos de NNyA (máx. 500 palabras)</label>
-            <textarea id="datosNnya" name="datosNnya" disabled></textarea>
-            <div class="counter hidden" id="counterNnya">0/500</div>
-          </div>
-
-          <!-- Plazos -->
-          <div class="field">
-            <label for="audiencias">Audiencias señaladas</label>
-            <input type="datetime-local" id="audiencias" name="audiencias" />
-          </div>
-          <div class="field">
-            <label for="vencimiento">Vencimiento</label>
-            <input type="datetime-local" id="vencimiento" name="vencimiento" />
-          </div>
-
-          <!-- Usuario / Estado -->
-          <div class="field">
-            <label for="usuarioAsignado">Usuario Asignado</label>
-            <select id="usuarioAsignado" name="usuarioAsignado"></select>
-          </div>
-          <div class="field">
-            <label for="estado">Estado del Proceso</label>
-            <select id="estado" name="estado">
-              <option>En trámite</option>
-              <option>Finalizado</option>
-              <option>Archivado</option>
-              <option>En Alzada</option>
-            </select>
-          </div>
-
-          <!-- Recursos -->
-          <div class="field">
-            <label for="recursos">Recursos Interpuestos</label>
-            <select id="recursos" name="recursos">
-              <option value="">Seleccione un recurso</option>
-              <option value="Apelación">Apelación</option>
-              <option value="Queja">Queja</option>
-              <option value="Inconstitucionalidad">Inconstitucionalidad</option>
-              <option value="Nulidad">Nulidad</option>
-              <option value="Reposición">Reposición</option>
-              <option value="Aclaratoria">Aclaratoria</option>
-              <option value="Recurso Extraordinario">Recurso Extraordinario</option>
-              <option value="Recurso de Hecho">Recurso de Hecho</option>
-              <option value="Recurso de Inaplicabilidad">Recurso de Inaplicabilidad</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="recursosContestacion">Recursos Contestación</label>
-            <select id="recursosContestacion" name="recursosContestacion">
-              <option value="">Seleccione un recurso</option>
-              <option value="Apelación">Apelación</option>
-              <option value="Queja">Queja</option>
-              <option value="Inconstitucionalidad">Inconstitucionalidad</option>
-              <option value="Nulidad">Nulidad</option>
-              <option value="Reposición">Reposición</option>
-              <option value="Aclaratoria">Aclaratoria</option>
-              <option value="Recurso Extraordinario">Recurso Extraordinario</option>
-              <option value="Recurso de Hecho">Recurso de Hecho</option>
-              <option value="Recurso de Inaplicabilidad">Recurso de Inaplicabilidad</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="estadoRecursos">Estado de Recursos</label>
-            <select id="estadoRecursos" name="estadoRecursos">
-              <option value="">Seleccione un estado</option>
-              <option>Pendiente</option>
-              <option>En trámite</option>
-              <option>Resuelto</option>
-              <option>Rechazado</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="vencimientoRecursos">Vencimiento de Recursos</label>
-            <input type="datetime-local" id="vencimientoRecursos" name="vencimientoRecursos" />
-          </div>
-
-          <!-- Audiencia en Cámara Gesell -->
-          <div class="field">
-            <label for="audienciaGesell">Audiencia en Cámara Gesell</label>
-            <div class="inline">
-              <input type="checkbox" id="habilitarAudienciaGesell" />
-              <span>Habilitar</span>
+      <div class="modal-header">
+        <i class="fa-solid fa-file-pen"></i>
+        <h2 id="tituloForm" style="margin:0;">Nuevo Expediente</h2>
+      </div>
+      <div class="modal-body">
+        <form id="formCausa" action="#" method="post" aria-label="Formulario para nuevo expediente o edición">
+          <input type="hidden" id="editId" />
+          <div class="grid">
+            <div class="field"><label for="numCausa">N° Expediente *</label><input id="numCausa" required autocomplete="off" /></div>
+            <div class="field"><label for="caratula">Carátula Completa *</label><textarea id="caratula" rows="2" required></textarea></div>
+            <div class="field"><label for="tipoProceso">Tipo de Proceso *</label><select id="tipoProceso" required></select></div>
+            <div class="field"><label for="juzgado">Juzgado *</label><select id="juzgado" required></select></div>
+            <div class="field"><label for="fechaInicio">Fecha de Inicio</label><input type="date" id="fechaInicio" /></div>
+            <div class="field"><label for="fechaPase">Fecha de Pase</label><input type="datetime-local" id="fechaPase" /></div>
+            <div class="field"><label for="intervencion">Intervención</label>
+              <select id="intervencion">
+                <option>Ministerio Complementario</option><option>Ministerio Principal</option><option>Patrocinante Actor</option>
+                <option>Patrocinante Demandado</option><option>Patrocinante Tercero</option><option value="Defensor de Ausente">Defensor de Ausente</option>
+                <option value="Defensor Oficial Asesor Letrado">Asesor Letrado</option><option>Asesor de incapaces</option> 
+              </select>
             </div>
-            <input type="datetime-local" id="audienciaGesell" name="audienciaGesell" disabled />
+            <div class="field"><label for="datosNnya">Datos de NNyA (máx. 500 palabras)</label><textarea id="datosNnya" disabled></textarea><div class="counter" id="counterNnya" style="display:none">0/500</div></div>
+            <div class="field"><label for="audiencias">Audiencias señaladas</label><input type="datetime-local" id="audiencias" /></div>
+            <div class="field"><label for="vencimiento">Vencimiento</label><input type="datetime-local" id="vencimiento" /></div>
+            <div class="field"><label for="usuarioAsignado">Usuario Asignado</label><select id="usuarioAsignado"></select></div>
+            <div class="field"><label for="estado">Estado del Proceso</label><select id="estado"><option>En trámite</option><option>Finalizado</option><option>Archivado</option><option>En Alzada</option></select></div>
+            <div class="field"><label for="recursos">Recursos Interpuestos</label>
+              <select id="recursos"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select>
+            </div>
+            <div class="field"><label for="recursosContestacion">Recursos Contestación</label>
+              <select id="recursosContestacion"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select>
+            </div>
+            <div class="field"><label for="estadoRecursos">Estado de Recursos</label><select id="estadoRecursos"><option value="">Seleccione un estado</option><option>Pendiente</option><option>En trámite</option><option>Resuelto</option><option>Rechazado</option></select></div>
+            <div class="field"><label for="vencimientoRecursos">Vencimiento de Recursos</label><input type="datetime-local" id="vencimientoRecursos" /></div>
+            <div class="field"><label for="audienciaGesell">Audiencia en Cámara Gesell</label><div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="habilitarAudienciaGesell" /><span>Habilitar</span></div><input type="datetime-local" id="audienciaGesell" disabled /></div>
+            <div class="field"><label for="nnyaGesell">NNyA en Gesell (máx. 400 palabras)</label><textarea id="nnyaGesell" disabled></textarea><div class="counter" id="counterNnyaGesell" style="display:none">0/400</div></div>
+            <div class="field" style="grid-column:1/-1"><label for="observaciones">Observaciones (máx. 1000 palabras)</label><textarea id="observaciones" rows="3"></textarea><div class="counter" id="counter">0/1000</div></div>
           </div>
-          <div class="field">
-            <label for="nnyaGesell">NNyA en Gesell (máx. 400 palabras)</label>
-            <textarea id="nnyaGesell" name="nnyaGesell" disabled></textarea>
-            <div class="counter hidden" id="counterNnyaGesell">0/400</div>
-          </div>
-
-          <!-- Observaciones -->
-          <div class="field" style="grid-column:1/-1">
-            <label for="observaciones">Observaciones (máx. 1000 palabras)</label>
-            <textarea id="observaciones" name="observaciones"></textarea>
-            <div class="counter" id="counter">0/1000</div>
-          </div>
-        </div>
-
-        <div class="controls-form">
-          <button class="btn-add" type="button" id="btnGuardar">💾 Guardar</button>
-          <button class="btn-delete" type="button" id="btnCancelar">Cancelar</button>
-          <button class="btn-print" type="button" id="btnPrintForm">🖨️ Imprimir Formulario</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Ver -->
-  <div id="modalVer">
-    <div class="content">
-      <h2>Detalle del Expediente</h2>
-      <div id="verContenido"></div>
-      <div class="controls-form" style="justify-content:flex-end;">
-        <button id="btnCerrarVer" class="btn btn-ghost">Cerrar</button>
-        <button id="btnPrintRegistro" class="btn btn-print">🖨️ Imprimir Registro</button>
+        </form>
+      </div>
+      <div class="controls-form">
+        <button class="btn-add" type="button" id="btnGuardar"><i class="fa fa-save"></i>Guardar</button>
+        <button class="btn-delete" type="button" id="btnEliminar"><i class="fa fa-trash"></i>Eliminar</button>
+        <button class="btn-print" type="button" id="btnPrintForm"><i class="fa fa-print"></i>Imprimir</button>
+        <button class="btn-cancel" type="button" id="btnCancelar"><i class="fa fa-times"></i>Cancelar</button>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    /* ===== Firebase ===== */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot, query, orderBy,
-      doc, addDoc, updateDoc, deleteDoc, getDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <!-- Modal: Ver Detalle + Bitácora -->
+  <div id="modalVer">
+    <div class="content">
+      <div class="modal-header">
+        <i class="fa-solid fa-eye"></i>
+        <h2 style="margin:0;">Detalle del Expediente</h2>
+      </div>
+      <div class="modal-body">
+        <div id="verContenido"></div>
+        <div id="bitacoraSection" style="margin-top:20px">
+          <h3>📓 Seguimiento de actuaciones judiciales</h3>
+          <div id="listBitacora"></div>
+          <textarea id="nuevaNota" placeholder="Escribe una nota..." style="width:100%;margin-top:10px"></textarea>
+          <button id="btnAgregarNota" class="btn btn-nuevo" style="margin-top:8px"><i class="fa fa-plus"></i>Agregar Nota</button>
+        </div>
+      </div>
+      <div class="controls-form" style="justify-content:flex-end;">
+        <button id="btnCerrarVer" class="btn btn-ghost"><i class="fa fa-xmark"></i>Cerrar</button>
+        <button id="btnPrintRegistro" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Registro</button>
+        <button id="btnPrintBitacora" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Bitácora</button>
+      </div>
+    </div>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBt6X0u0BpiNPcV2SNPrN-spCmjl2AhZaA",
-      authDomain: "causas-defensoria.firebaseapp.com",
-      projectId: "causas-defensoria",
-      storageBucket: "causas-defensoria.firebasestorage.app",
-      messagingSenderId: "186064671470",
-      appId: "1:186064671470:web:b58bae5eadbe6e469f19ff"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <!-- Firebase v10 COMPAT (no modular) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    /* ===== Referencias UI ===== */
-    const tbody = document.getElementById("tbodyCausas");
-    const tbodyCompleto = document.getElementById("tbodyCompleto");
-    const modal = document.getElementById("modal");
-    const modalVer = document.getElementById("modalVer");
-    const verContenido = document.getElementById("verContenido");
-    const tituloForm = document.getElementById("tituloForm");
-    const editId = document.getElementById("editId");
-    const buscador = document.getElementById("buscador");
-    const filtroEstado = document.getElementById("filtroEstado");
-    const filtroUsuario = document.getElementById("filtroUsuario");
+  <script>
+  // ===== Firebase (COMPAT) =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyBt6X0u0BpiNPcV2SNPrN-spCmjl2AhZaA",
+    authDomain: "causas-defensoria.firebaseapp.com",
+    projectId: "causas-defensoria",
+    storageBucket: "causas-defensoria.appspot.com", // ✅ corregido
+    messagingSenderId: "186064671470",
+    appId: "1:186064671470:web:b58bae5eadbe6e469f19ff"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    // Sidebar refs
-    const listAud = document.getElementById("listAud");
-    const listGes = document.getElementById("listGesell");
-    const listVenc = document.getElementById("listVenc");
-    const listVrec = document.getElementById("listVrec");
-    const cAud = document.getElementById("countAud");
-    const cGes = document.getElementById("countGesell");
-    const cVenc = document.getElementById("countVenc");
-    const cVrec = document.getElementById("countVrec");
+  // ===== Helpers UI =====
+  const $ = (id)=>document.getElementById(id);
+  const tbody = $("tbodyCausas");
+  const tbodyCompleto = $("tbodyCompleto");
+  const modal = $("modal");
+  const modalVer = $("modalVer");
+  const verContenido = $("verContenido");
+  const tituloForm = $("tituloForm");
+  const editId = $("editId");
+  const buscador = $("buscador");
+  const filtroEstado = $("filtroEstado");
+  const filtroUsuario = $("filtroUsuario");
 
-    // Tabs / toggle
-    const tabCompacta = document.getElementById("tabCompacta");
-    const tabCompleta = document.getElementById("tabCompleta");
-    const wrapCompacta = document.getElementById("wrapCompacta");
-    const wrapCompleta = document.getElementById("wrapCompleta");
-    const btnToggleVista = document.getElementById("btnToggleVista");
+  // Sidebar refs
+  const listAud = $("listAud");
+  const listGes = $("listGesell");
+  const listVenc = $("listVenc");
+  const listVrec = $("listVrec");
+  const cAud = $("countAud");
+  const cGes = $("countGesell");
+  const cVenc = $("countVenc");
+  const cVrec = $("countVrec");
 
-    /* ===== Util ===== */
-    const fmt = d => {
-      if(!d) return "";
-      const date = d.seconds ? new Date(d.seconds*1000) : new Date(d);
-      return date.toLocaleString();
-    };
-    const fmtShort = d => {
-      if(!d) return "";
-      const date = d.seconds ? new Date(d.seconds*1000) : new Date(d);
-      return date.toLocaleDateString()+" "+date.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-    };
-    const isDateField = id => ([
-      "fechaInicio","fechaPase","audiencias","vencimiento",
-      "vencimientoRecursos","audienciaGesell"
-    ].includes(id));
+  // Tabs / toggle
+  const tabCompacta = $("tabCompacta");
+  const tabCompleta = $("tabCompleta");
+  const wrapCompacta = $("wrapCompacta");
+  const wrapCompleta = $("wrapCompleta");
+  const btnToggleVista = $("btnToggleVista");
 
-    let datosCache = []; // para filtros/búsqueda
-    let modo = "nuevo";
+  // ===== Utils =====
+  const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
+  const fmt = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return ("0"+date.getDate()).slice(-2)+"/"+("0"+(date.getMonth()+1)).slice(-2)+"/"+date.getFullYear(); };
+  const fmtShort = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return date.toLocaleDateString()+" "+date.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); };
 
-    /* ===== Listeners Firestore ===== */
-    const q = query(collection(db, "causas"), orderBy("fechaRegistro","desc"));
-    onSnapshot(q, snap => {
-      const arr = [];
-      snap.forEach(d => arr.push({ id:d.id, ...d.data() }));
+  let datosCache = [];
+  let causaActualId = null;
+  let unsubCausas = null;
+  let unsubBitacoraModal = null;
+  let unsubBitacoraSidebar = null;
+
+  // ===== Realtime: causas =====
+  function suscribirCausas(){
+    if (unsubCausas) unsubCausas();
+    unsubCausas = db.collection("causas").orderBy("fechaRegistro","desc").onSnapshot(snap=>{
+      const arr=[]; snap.forEach(d=>arr.push({id:d.id, ...d.data()}));
       datosCache = arr;
       renderTablas(filtrarDatos());
       renderSidebar(arr);
       poblarFiltroUsuarios(arr);
+    }, err=> console.error("onSnapshot causas:", err));
+  }
+
+  // ===== Filtros =====
+  function filtrarDatos(){
+    const q = (buscador.value||"").toLowerCase();
+    const est = (filtroEstado.value||"").toLowerCase();
+    const usu = (filtroUsuario.value||"").toLowerCase();
+    return datosCache.filter(d=>{
+      const texto = [d.numCausa,d.caratula,d.tipoProceso,d.juzgado,d.usuarioAsignado,d.estado,d.intervencion,d.recursos,d.recursosContestacion,d.estadoRecursos]
+        .map(x=>(x||"").toString().toLowerCase()).join(" ");
+      const okTexto = !q || texto.includes(q);
+      const okEstado = !est || (d.estado||"").toLowerCase()===est;
+      const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase()===usu;
+      return okTexto && okEstado && okUsuario;
+    });
+  }
+  buscador.oninput = ()=>renderTablas(filtrarDatos());
+  filtroEstado.onchange = ()=>renderTablas(filtrarDatos());
+  filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
+
+  // ===== Render =====
+  function accionesHTML(id){
+    return `<button class="btn-view" data-id="${id}" title="Ver"><i class="fa fa-eye"></i></button>
+            <button class="btn-edit" data-id="${id}" title="Editar"><i class="fa fa-pen"></i></button>
+            <button class="btn-delete" data-id="${id}" title="Eliminar"><i class="fa fa-trash"></i></button>
+            <button class="btn-view-bitacora" data-id="${id}" title="Bitácora"><i class="fa fa-note-sticky"></i></button>`;
+  }
+
+  function renderTablas(data){
+    // Compacta
+    tbody.innerHTML = data.length ? "" : "<tr><td colspan='8'>No hay registros</td></tr>";
+    data.forEach(d=>{
+      tbody.insertAdjacentHTML("beforeend", `
+        <tr>
+          <td class="mono">${d.numCausa||""}</td>
+          <td>${d.caratula||""}</td>
+          <td>${d.tipoProceso||""}</td>
+          <td>${d.juzgado||""}</td>
+          <td>${d.usuarioAsignado||""}</td>
+          <td>${d.estado||""}</td>
+          <td class="nowrap">${fmt(d.fechaRegistro)}</td>
+          <td class="nowrap">${accionesHTML(d.id)}</td>
+        </tr>`);
     });
 
-    /* ===== Búsqueda / Filtros ===== */
-    function filtrarDatos(){
-      const q = (buscador.value||"").toLowerCase();
-      const est = (filtroEstado.value||"").toLowerCase();
-      const usu = (filtroUsuario.value||"").toLowerCase();
-      return datosCache.filter(d=>{
-        const texto = [
-          d.numCausa,d.caratula,d.tipoProceso,d.juzgado,d.usuarioAsignado,d.estado,
-          d.intervencion,d.recursos,d.recursosContestacion,d.estadoRecursos
-        ].map(x=>(x||"").toString().toLowerCase()).join(" ");
-        const okTexto = !q || texto.includes(q);
-        const okEstado = !est || (d.estado||"").toLowerCase()===est;
-        const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase()===usu;
-        return okTexto && okEstado && okUsuario;
-      });
-    }
-    buscador.oninput = ()=>renderTablas(filtrarDatos());
-    filtroEstado.onchange = ()=>renderTablas(filtrarDatos());
-    filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
+    // Completa
+    tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='21'>No hay registros</td></tr>";
+    data.forEach(d=>{
+      tbodyCompleto.insertAdjacentHTML("beforeend", `
+        <tr>
+          <td class="mono">${d.numCausa||""}</td>
+          <td>${d.caratula||""}</td>
+          <td>${d.tipoProceso||""}</td>
+          <td>${d.juzgado||""}</td>
+          <td>${fmt(d.fechaInicio)}</td>
+          <td>${fmt(d.fechaPase)}</td>
+          <td>${d.intervencion||""}</td>
+          <td>${d.datosNnya||""}</td>
+          <td>${fmt(d.audiencias)}</td>
+          <td>${fmt(d.vencimiento)}</td>
+          <td>${d.usuarioAsignado||""}</td>
+          <td>${d.estado||""}</td>
+          <td>${d.recursos||""}</td>
+          <td>${d.recursosContestacion||""}</td>
+          <td>${d.estadoRecursos||""}</td>
+          <td>${fmt(d.vencimientoRecursos)}</td>
+          <td>${fmt(d.audienciaGesell)}</td>
+          <td>${d.nnyaGesell||""}</td>
+          <td>${d.observaciones||""}</td>
+          <td>${fmt(d.fechaRegistro)}</td>
+          <td class="nowrap">${accionesHTML(d.id)}</td>
+        </tr>`);
+    });
 
-    /* ===== Render tablas ===== */
-    function renderTablas(data){
-      // Compacta
-      tbody.innerHTML = data.length ? "" : "<tr><td colspan='8'>No hay registros</td></tr>";
-      data.forEach(d => {
-        tbody.insertAdjacentHTML("beforeend", `
-          <tr>
-            <td class="mono">${d.numCausa||""}</td>
-            <td>${d.caratula||""}</td>
-            <td>${d.tipoProceso||""}</td>
-            <td>${d.juzgado||""}</td>
-            <td>${d.usuarioAsignado||""}</td>
-            <td>${d.estado||""}</td>
-            <td class="nowrap">${fmt(d.fechaRegistro)}</td>
-            <td class="nowrap">
-              <button class="btn-view" data-id="${d.id}">👁️</button>
-              <button class="btn-edit" data-id="${d.id}">✏️</button>
-              <button class="btn-delete" data-id="${d.id}">🗑️</button>
-            </td>
-          </tr>
-        `);
-      });
+    // Bind actions
+    document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
+    document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
+    document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>eliminar(b.dataset.id));
+    document.querySelectorAll(".btn-view-bitacora").forEach(b=>b.onclick=()=>abrirBitacoraSidebar(b.dataset.id));
+  }
 
-      // Completa (todas las columnas)
-      tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='21'>No hay registros</td></tr>";
-      data.forEach(d=>{
-        tbodyCompleto.insertAdjacentHTML("beforeend", `
-          <tr>
-            <td class="mono">${d.numCausa||""}</td>
-            <td>${d.caratula||""}</td>
-            <td>${d.tipoProceso||""}</td>
-            <td>${d.juzgado||""}</td>
-            <td>${fmt(d.fechaInicio)}</td>
-            <td>${fmt(d.fechaPase)}</td>
-            <td>${d.intervencion||""}</td>
-            <td>${d.datosNnya||""}</td>
-            <td>${fmt(d.audiencias)}</td>
-            <td>${fmt(d.vencimiento)}</td>
-            <td>${d.usuarioAsignado||""}</td>
-            <td>${d.estado||""}</td>
-            <td>${d.recursos||""}</td>
-            <td>${d.recursosContestacion||""}</td>
-            <td>${d.estadoRecursos||""}</td>
-            <td>${fmt(d.vencimientoRecursos)}</td>
-            <td>${fmt(d.audienciaGesell)}</td>
-            <td>${d.nnyaGesell||""}</td>
-            <td>${d.observaciones||""}</td>
-            <td>${fmt(d.fechaRegistro)}</td>
-            <td class="nowrap">
-              <button class="btn-view" data-id="${d.id}">👁️</button>
-              <button class="btn-edit" data-id="${d.id}">✏️</button>
-              <button class="btn-delete" data-id="${d.id}">🗑️</button>
-            </td>
-          </tr>
-        `);
-      });
-
-      // Bind acciones
-      document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
-      document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
-      document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>eliminar(b.dataset.id));
-    }
-
-    /* ===== Sidebar (audiencias, gesell, vencimientos y venc. recursos) ===== */
-    function renderSidebar(data){
-      // ventana de 30 días
-      const hoy = new Date();
-      const limite = new Date(); limite.setDate(hoy.getDate()+30);
-
-      const eventos = {
-        aud: [],       // audiencias
-        ges: [],       // gesell
-        venc: [],      // vencimientos
-        vrec: []       // vencimientos de recursos
-      };
-
-      const pushIfRange = (arr, fecha, label)=>{
-        if(!fecha) return;
-        const f = fecha.seconds ? new Date(fecha.seconds*1000) : new Date(fecha);
-        if(isNaN(f)) return;
-        if(f>=hoy && f<=limite) arr.push({f, label});
-      };
-
-      data.forEach(d=>{
-        const id = d.numCausa || d.id;
-        pushIfRange(eventos.aud, d.audiencias, `${id}`);
-        pushIfRange(eventos.ges, d.audienciaGesell, `${id}`);
-        pushIfRange(eventos.venc, d.vencimiento, `${id}`);
-        pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} — ${d.recursos||'Recurso'}`);
-      });
-
-      const renderList = (arr, target, counterRef, empty="No hay fechas próximas")=>{
-        arr.sort((a,b)=>a.f-b.f);
-        target.innerHTML = "";
-        if(!arr.length){ target.innerHTML = `<div class="k">${empty}</div>`; counterRef.textContent = "0"; return; }
-        counterRef.textContent = String(arr.length);
-        arr.forEach(e=>{
-          target.insertAdjacentHTML("beforeend", `
-            <div class="event">
-              <div class="when">${fmtShort(e.f)}</div>
-              <div class="what">— ${e.label}</div>
-            </div>
-          `);
-        });
-      };
-
-      renderList(eventos.aud, listAud, cAud);
-      renderList(eventos.ges, listGes, cGes);
-      renderList(eventos.venc, listVenc, cVenc);
-      renderList(eventos.vrec, listVrec, cVrec);
-    }
-
-    /* ===== Poblado de filtro Usuarios ===== */
-    function poblarFiltroUsuarios(data){
-      const set = new Set([""]);
-      data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
-      const current = filtroUsuario.value;
-      filtroUsuario.innerHTML = "";
-      [...set].forEach(u=>{
-        const opt = document.createElement("option");
-        opt.value = u; opt.textContent = u ? u : "Usuario (todos)";
-        filtroUsuario.appendChild(opt);
-      });
-      filtroUsuario.value = current || "";
-    }
-
-    /* ===== Nuevo registro ===== */
-    document.getElementById("btnNuevo").onclick = ()=>{
-      modo = "nuevo";
-      resetFormCausa();
-      editId.value = "";
-      tituloForm.textContent = "Nuevo Expediente";
-      modal.style.display = "flex";
+  // ===== Sidebar (eventos próximos) =====
+  function renderSidebar(data){
+    const hoy = new Date();
+    const limite = new Date(hoy.getTime() + 30*24*60*60*1000);
+    const eventos = {aud:[], ges:[], venc:[], vrec:[]};
+    const pushIfRange = (arr, fecha, label)=>{ const f = toDate(fecha); if(!f || isNaN(f)) return; if(f>=hoy && f<=limite) arr.push({f,label}); };
+    data.forEach(d=>{
+      const id = d.numCausa || d.id;
+      pushIfRange(eventos.aud, d.audiencias, `${id}`);
+      pushIfRange(eventos.ges, d.audienciaGesell, `${id}`);
+      pushIfRange(eventos.venc, d.vencimiento, `${id}`);
+      pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} — ${d.recursos||'Recurso'}`);
+    });
+    const renderList = (arr, target, counterRef, empty)=>{
+      arr.sort((a,b)=>a.f-b.f); target.innerHTML="";
+      if(!arr.length){ target.innerHTML = `<div class="k">${empty}</div>`; counterRef.textContent = "0"; return; }
+      counterRef.textContent = String(arr.length);
+      arr.forEach(e=> target.insertAdjacentHTML("beforeend", `<div class="event"><div class="when">${fmtShort(e.f)}</div><div class="what">— ${e.label}</div></div>`));
     };
+    renderList(eventos.aud, listAud, cAud, "No hay audiencias próximas");
+    renderList(eventos.ges, listGes, cGes, "No hay Cámaras Gesell próximas");
+    renderList(eventos.venc, listVenc, cVenc, "No hay vencimientos próximos");
+    renderList(eventos.vrec, listVrec, cVrec, "No hay venc. de recursos próximos");
+  }
 
-    /* ===== Guardar ===== */
-    document.getElementById("btnGuardar").onclick = async ()=>{
-      const datos = recolectarDatosForm();
-      if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) {
-        alert("Completa los campos obligatorios (N° Expediente, Carátula, Tipo y Juzgado).");
-        return;
-      }
-      if (modo==="nuevo") {
-        await addDoc(collection(db,"causas"), { ...datos, fechaRegistro: serverTimestamp() });
-      } else {
-        await updateDoc(doc(db,"causas", editId.value), datos);
+  // ===== Filtro usuarios =====
+  function poblarFiltroUsuarios(data){
+    const set = new Set([""]); data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
+    const current = filtroUsuario.value; filtroUsuario.innerHTML = "";
+    [...set].forEach(u=>{ const opt = document.createElement("option"); opt.value=u; opt.textContent = u ? u : "Usuario (todos)"; filtroUsuario.appendChild(opt); });
+    filtroUsuario.value = current || "";
+  }
+
+  // ===== ABM Causas =====
+  $("btnNuevo").onclick = ()=>{ modo = "nuevo"; resetFormCausa(); editId.value = ""; tituloForm.textContent = "Nuevo Expediente"; modal.style.display = "flex"; };
+
+  $("btnGuardar").onclick = async ()=>{
+    const datos = recolectarDatosForm();
+    if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) { alert("Completa los campos obligatorios (N° Expediente, Carátula, Tipo y Juzgado)."); return; }
+    try{
+      if (modo==="nuevo"){
+        await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
+      }else{
+        await db.collection("causas").doc(editId.value).update(datos);
       }
       modal.style.display = "none";
-    };
+    }catch(e){ console.error(e); alert("No se pudo guardar. Revisa la consola."); }
+  };
 
-    /* ===== Cancelar ===== */
-    document.getElementById("btnCancelar").onclick = ()=>{
-      if (confirm("¿Cancelar? Se perderán los cambios no guardados.")) {
-        modal.style.display = "none";
-      }
-    };
+  $("btnEliminar").onclick = async ()=>{
+    const id = editId.value;
+    if (!id){ alert("Abrí un expediente para poder eliminarlo."); return; }
+    if (!confirm("¿Eliminar registro?")) return;
+    try{ await db.collection("causas").doc(id).delete(); modal.style.display = "none"; }
+    catch(e){ console.error(e); alert("No se pudo eliminar"); }
+  };
 
-    /* ===== Editar / Eliminar / Ver ===== */
-    async function abrirEditar(id){
-      modo = "editar";
-      resetFormCausa();
-      editId.value = id;
-      tituloForm.textContent = "Editar Expediente";
-      const snap = await getDoc(doc(db,"causas",id));
-      if (snap.exists()){
-        cargarDatosEnForm(snap.data());
-      }
-      modal.style.display = "flex";
-    }
+  $("btnCancelar").onclick = ()=>{ if (confirm("¿Cancelar? Se perderán los cambios no guardados.")) modal.style.display = "none"; };
 
-    async function eliminar(id){
-      if (confirm("¿Eliminar registro?")) {
-        await deleteDoc(doc(db,"causas",id));
-      }
-    }
+  async function abrirEditar(id){
+    modo = "editar"; resetFormCausa(); editId.value = id; tituloForm.textContent = "Editar Expediente";
+    try{
+      const snap = await db.collection("causas").doc(id).get();
+      if (snap.exists){ cargarDatosEnForm(snap.data()); modal.style.display = "flex"; }
+    }catch(e){ console.error(e); alert("No se pudo abrir el registro"); }
+  }
 
-    async function abrirVer(id){
-      const d = (await getDoc(doc(db,"causas",id))).data();
-      const pares = Object.entries(d).filter(([k,v])=>v);
-      verContenido.innerHTML = pares.map(([k,v])=>{
-        const val = v?.seconds ? fmt(v) : v;
-        return `<p><strong>${k}:</strong> ${val}</p>`;
-      }).join("");
+  async function eliminar(id){
+    if (!confirm("¿Eliminar registro?")) return;
+    try{ await db.collection("causas").doc(id).delete(); }catch(e){ console.error(e); alert("No se pudo eliminar"); }
+  }
+
+  async function abrirVer(id){
+    causaActualId = id;  // 👈 Aseguramos que quede seteado
+    try{
+      const snap = await db.collection("causas").doc(id).get();
+      const d = snap.data();
+      const pares = Object.entries(d||{}).filter(([k,v])=>v);
+      verContenido.innerHTML = pares.map(([k,v])=>`<p><strong>${k}:</strong> ${v?.seconds?fmt(v):v}</p>`).join("");
       modalVer.style.display = "flex";
-    }
-    document.getElementById("btnCerrarVer").onclick = ()=>modalVer.style.display="none";
+      abrirBitacoraSidebar(id);
+      suscribirBitacoraModal(id);
+    }catch(e){ console.error(e); alert("No se pudo abrir el detalle"); }
+  }
 
-    /* ===== Imprimir ===== */
-    const printSection = (html)=>{
-      const w = window.open("","_blank","width=900,height=700");
-      w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`);
-      w.document.close(); w.focus(); w.print();
-    };
-    document.getElementById("btnPrintListado").onclick = ()=>{
-      const active = wrapCompleta.style.display!=="none" ? tbodyCompleto : tbody;
-      const head = active.closest("table").querySelector("thead").outerHTML;
-      const body = active.outerHTML;
-      printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`);
-    };
-    document.getElementById("btnPrintFechas").onclick = ()=>{
-      const html = `
-        <h3>Audiencias</h3>${listAud.outerHTML}
-        <h3>Cámara Gesell</h3>${listGes.outerHTML}
-        <h3>Vencimientos</h3>${listVenc.outerHTML}
-        <h3>Venc. de Recursos</h3>${listVrec.outerHTML}
-      `;
-      printSection(html);
-    };
-    document.getElementById("btnPrintForm").onclick = ()=>printSection(document.getElementById("formCausa").outerHTML);
-    document.getElementById("btnPrintRegistro").onclick = ()=>printSection(document.getElementById("verContenido").outerHTML);
-
-    /* ===== Lógica del form (idéntica a la tuya, integrada) ===== */
-    const juzgadosPorTipo = {
-      Administrativo: ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
-      Civil: ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 1 - Oberá","Juzgado Civil y Comercial N° 2 - Oberá","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
-      Penal: ["Juzgado de Instrucción N° 1 - Posadas","Juzgado Correccional y de Menores N° 1 - Posadas","Juzgado Correccional y de Menores N° 2 - Posadas"],
-      Laboral: ["Juzgado Laboral N° 1 - Posadas","Juzgado Laboral N° 2 - Posadas","Juzgado Laboral N° 3 - Posadas","Juzgado Laboral N° 4 - Posadas"],
-      Familia: ["Juzgado de Familia N° 1 - Posadas","Juzgado de Familia N° 2 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
-      "Violencia Familiar": ["Juzgado de Violencia Familiar N° 1 - Posadas","Juzgado de Violencia Familiar N° 2 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
-      Paz: ["Juzgado de Paz Civil Comercial N° 1 - Posadas","Juzgado de Paz - San José","Juzgado de Paz - San Martín","Juzgado de Paz - Santa Ana","Juzgado de Paz - San María","Juzgado de Paz - Tres Capones"]
-    };
-
-    const usuarios = [
-      "Bazante Nadia Romina","Cardozo Maria Raquel","Cedron Noelia Aurora","Corrales Alicia Mariela","Escobar Monica Graciela","Fioravante Romulo","Gonzalez Alberto Misael","Gonzalez Juan Jose","Gudiño Natalia Esther","Magnani Enzo Luciano","Pablos Patricia","Palacios Ana Gabriela","Ramos Marcelo Gustavo","Riveros Patricia Soledad","Sosa Rita Cecilia"
-    ];
-
-    const selTipo = document.getElementById("tipoProceso");
-    const selJuz = document.getElementById("juzgado");
-    const selUsu = document.getElementById("usuarioAsignado");
-
-    function initForm(){
-      const tipos = ["Administrativo","Civil","Penal","Laboral","Familia","Violencia Familiar","Paz"];
-      selTipo.innerHTML = ""; tipos.forEach(t=>{let o=document.createElement("option");o.value=t;o.textContent=t;selTipo.appendChild(o);});
-      selUsu.innerHTML = ""; usuarios.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=u;selUsu.appendChild(o);});
-      selTipo.value = "Administrativo"; actualizarJuzgados();
-      toggleGesell(false); document.getElementById("habilitarAudienciaGesell").checked = false;
-    }
-    function actualizarJuzgados(){
-      const tipo = selTipo.value; const j = juzgadosPorTipo[tipo]||[];
-      selJuz.innerHTML=""; j.forEach(x=>{let o=document.createElement("option");o.value=x;o.textContent=x;selJuz.appendChild(o);});
-    }
-    selTipo.addEventListener("change", actualizarJuzgados);
-
-    // Datos NNyA habilitados solo si Ministerio Complementario
-    document.getElementById("intervencion").addEventListener("change", function(){
-      const datosNnya = document.getElementById("datosNnya");
-      const contadorNnya = document.getElementById("counterNnya");
-      if (this.value === "Ministerio Complementario") {
-        datosNnya.removeAttribute("disabled"); contadorNnya.classList.remove("hidden");
-      } else {
-        datosNnya.value = ""; datosNnya.setAttribute("disabled","true"); contadorNnya.classList.add("hidden");
-      }
-    });
-
-    const limitWords = (text, max) => {
-      const words = text.trim().split(/\s+/).filter(Boolean);
-      if (words.length > max) return words.slice(0,max).join(" ");
-      return text;
-    };
-    document.getElementById("observaciones").addEventListener("input", function(){
-      this.value = limitWords(this.value, 1000);
-      document.getElementById("counter").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/1000`;
-    });
-    document.getElementById("datosNnya").addEventListener("input", function(){
-      this.value = limitWords(this.value, 500);
-      document.getElementById("counterNnya").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/500`;
-    });
-    document.getElementById("nnyaGesell").addEventListener("input", function(){
-      this.value = limitWords(this.value, 400);
-      document.getElementById("counterNnyaGesell").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/400`;
-    });
-
-    document.getElementById("habilitarAudienciaGesell").addEventListener("change", function(){
-      toggleGesell(this.checked);
-    });
-    function toggleGesell(enabled){
-      const ag = document.getElementById("audienciaGesell");
-      const ng = document.getElementById("nnyaGesell");
-      if (enabled) {
-        ag.removeAttribute("disabled"); ng.removeAttribute("disabled");
-        document.getElementById("counterNnyaGesell").classList.remove("hidden");
-      } else {
-        ag.value = ""; ng.value = "";
-        ag.setAttribute("disabled","true"); ng.setAttribute("disabled","true");
-        document.getElementById("counterNnyaGesell").classList.add("hidden");
-      }
-    }
-
-    function resetFormCausa(){
-      document.getElementById("formCausa").reset();
-      initForm();
-      document.getElementById("counter").textContent = "0/1000";
-      document.getElementById("counterNnya").textContent = "0/500";
-      document.getElementById("counterNnyaGesell").textContent = "0/400";
-    }
-
-    function recolectarDatosForm(){
-      const fields = [
-        "numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase",
-        "intervencion","datosNnya","audiencias","vencimiento",
-        "usuarioAsignado","estado",
-        "recursos","recursosContestacion","estadoRecursos","vencimientoRecursos",
-        "audienciaGesell","nnyaGesell","observaciones"
-      ];
-      const datos = {};
-      fields.forEach(id=>{
-        const el = document.getElementById(id);
-        if (!el) return;
-        let val = el.value;
-        if (["date","datetime-local"].includes(el.type)) datos[id] = val ? new Date(val) : null;
-        else datos[id] = val || "";
+  function suscribirBitacoraModal(id){
+    if (unsubBitacoraModal) unsubBitacoraModal();
+    causaActualId = id;
+    unsubBitacoraModal = db.collection("causas").doc(id).collection("seguimiento").orderBy("fecha","asc").onSnapshot(snap=>{
+      const listBitacora = $("listBitacora");
+      listBitacora.innerHTML = "";
+      if (snap.empty){ listBitacora.innerHTML = "<i>No hay notas registradas</i>"; return; }
+      snap.forEach(doc=>{
+        const n = doc.data(); const f = n.fecha?.seconds ? fmt(n.fecha) : "";
+        listBitacora.insertAdjacentHTML("beforeend", `<div class="note"><div><b>${n.usuario||"Anon"}:</b> ${n.texto}</div><small style="color:#7f8c8d">${f}</small></div>`);
       });
-      return datos;
-    }
-
-    function cargarDatosEnForm(d){
-      const setVal = (id, val)=>{
-        const el = document.getElementById(id); if(!el) return;
-        if (val?.seconds) {
-          const date = new Date(val.seconds*1000);
-          if (el.type === "date") el.value = date.toISOString().split("T")[0];
-          else if (el.type === "datetime-local") el.value = date.toISOString().slice(0,16);
-          else el.value = fmt(val);
-        } else {
-          el.value = val ?? "";
-        }
-      };
-      initForm();
-      if (d.tipoProceso){ selTipo.value = d.tipoProceso; actualizarJuzgados(); }
-
-      [
-        "numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya",
-        "usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos",
-        "nnyaGesell","observaciones"
-      ].forEach(k=> setVal(k, d[k]));
-
-      ["fechaInicio","fechaPase","audiencias","vencimiento","vencimientoRecursos","audienciaGesell"]
-        .forEach(k=> setVal(k, d[k]));
-
-      const habilitar = !!(d.audienciaGesell || d.nnyaGesell);
-      document.getElementById("habilitarAudienciaGesell").checked = habilitar;
-      toggleGesell(habilitar);
-    }
-
-    // Cerrar modales clic fuera
-    window.addEventListener("click", e=>{
-      if (e.target === modal) modal.style.display="none";
-      if (e.target === modalVer) modalVer.style.display="none";
     });
+  }
 
-    /* ===== Tabs / Toggle de vistas ===== */
-    const activateTab = (full=false)=>{
-      if(full){
-        tabCompleta.classList.add("active"); tabCompacta.classList.remove("active");
-        wrapCompleta.style.display="block"; wrapCompacta.style.display="none";
-        btnToggleVista.textContent = "↔️ Vista compacta";
-      }else{
-        tabCompacta.classList.add("active"); tabCompleta.classList.remove("active");
-        wrapCompacta.style.display="block"; wrapCompleta.style.display="none";
-        btnToggleVista.textContent = "↔️ Vista completa";
-      }
-    };
-    tabCompacta.onclick = ()=>activateTab(false);
-    tabCompleta.onclick = ()=>activateTab(true);
-    btnToggleVista.onclick = ()=>activateTab(wrapCompacta.style.display!=="none");
+  async function abrirBitacoraSidebar(id){
+    if (unsubBitacoraSidebar) unsubBitacoraSidebar();
+    causaActualId = id;
+    unsubBitacoraSidebar = db.collection("causas").doc(id).collection("seguimiento").orderBy("fecha","asc").onSnapshot(snap=>{
+      const side = $("bitacoraSidebar"); side.innerHTML = "";
+      if (snap.empty){ side.innerHTML = "<i>No hay notas en esta causa</i>"; return; }
+      snap.forEach(doc=>{
+        const n = doc.data(); const f = n.fecha?.seconds ? fmt(n.fecha) : "";
+        side.insertAdjacentHTML("beforeend", `<div class="note" style="border-left-color:#1f3a93"><div><b>${n.usuario||"Anon"}:</b> ${n.texto}</div><small style="color:#7f8c8d">${f}</small></div>`);
+      });
+    });
+  }
 
-    // Prefill inicial filtro usuarios
-    poblarFiltroUsuarios([]);
+  $("btnCerrarVer").onclick = ()=> modalVer.style.display = "none";
 
-    // Botón cerrar modal (si existiera en futuras versiones)
-    document.getElementById("btnCerrarModal")?.addEventListener("click", ()=> modal.style.display="none");
+  // ===== Imprimir =====
+  const printSection = (html)=>{ const w = window.open("","_blank","width=900,height=700"); w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`); w.document.close(); w.focus(); w.print(); };
+  $("btnPrintListado").onclick = ()=>{ const activeTbody = wrapCompleta.style.display!=="none" ? tbodyCompleto : tbody; const head = activeTbody.closest("table").querySelector("thead").outerHTML; const body = activeTbody.outerHTML; printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`); };
+  $("btnPrintFechas").onclick = ()=>{ const html = `<h3>Audiencias</h3>${listAud.outerHTML}<h3>Cámara Gesell</h3>${listGes.outerHTML}<h3>Vencimientos</h3>${listVenc.outerHTML}<h3>Venc. de Recursos</h3>${listVrec.outerHTML}`; printSection(html); };
+  $("btnPrintForm").onclick = ()=> printSection($("formCausa").outerHTML);
+  $("btnPrintRegistro").onclick = ()=> printSection($("verContenido").outerHTML);
+  $("btnPrintBitacora").onclick = ()=> printSection($("bitacoraSection").outerHTML);
+
+  // ===== Form =====
+  const juzgadosPorTipo = {
+    Administrativo: ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
+    Civil: ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 1 - Oberá","Juzgado Civil y Comercial N° 2 - Oberá","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
+    Penal: ["Juzgado de Instrucción N° 1 - Posadas","Juzgado Correccional y de Menores N° 1 - Posadas","Juzgado Correccional y de Menores N° 2 - Posadas"],
+    Laboral: ["Juzgado Laboral N° 1 - Posadas","Juzgado Laboral N° 2 - Posadas","Juzgado Laboral N° 3 - Posadas","Juzgado Laboral N° 4 - Posadas"],
+    Familia: ["Juzgado de Familia N° 1 - Posadas","Juzgado de Familia N° 2 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
+    "Violencia Familiar": ["Juzgado de Violencia Familiar N° 1 - Posadas","Juzgado de Violencia Familiar N° 2 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
+    Paz: ["Juzgado de Paz Civil Comercial N° 1 - Posadas","Juzgado de Paz - San José","Juzgado de Paz - San Martín","Juzgado de Paz - Santa Ana","Juzgado de Paz - San María","Juzgado de Paz - Tres Capones"]
+  };
+
+  const usuarios = ["Bazante Nadia Romina","Cardozo Maria Raquel","Cedron Noelia Aurora","Corrales Alicia Mariela","Escobar Monica Graciela","Fioravante Romulo","Gonzalez Alberto Misael","Gonzalez Juan Jose","Gudiño Natalia Esther","Magnani Enzo Luciano","Pablos Patricia","Palacios Ana Gabriela","Ramos Marcelo Gustavo","Riveros Patricia Soledad","Sosa Rita Cecilia"];
+
+  const selTipo = $("tipoProceso");
+  const selJuz = $("juzgado");
+  const selUsu = $("usuarioAsignado");
+
+  function initForm(){
+    const tipos = ["Administrativo","Civil","Penal","Laboral","Familia","Violencia Familiar","Paz"];
+    selTipo.innerHTML = ""; tipos.forEach(t=>{let o=document.createElement("option");o.value=t;o.textContent=t;selTipo.appendChild(o);});
+    selUsu.innerHTML = ""; usuarios.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=u;selUsu.appendChild(o);});
+    selTipo.value = "Administrativo"; actualizarJuzgados();
+    toggleGesell(false); $("habilitarAudienciaGesell").checked = false;
+  }
+  function actualizarJuzgados(){ const tipo = selTipo.value; const j = juzgadosPorTipo[tipo]||[]; selJuz.innerHTML=""; j.forEach(x=>{let o=document.createElement("option");o.value=x;o.textContent=x;selJuz.appendChild(o);}); }
+  selTipo.addEventListener("change", actualizarJuzgados);
+
+  $("intervencion").addEventListener("change", function(){
+    const datosNnya = $("datosNnya");
+    const contadorNnya = $("counterNnya");
+    if (this.value === "Ministerio Complementario") { datosNnya.removeAttribute("disabled"); contadorNnya.style.display='block'; }
+    else { datosNnya.value = ""; datosNnya.setAttribute("disabled","true"); contadorNnya.style.display='none'; }
+  });
+
+  const limitWords = (text, max)=>{ const words = text.trim().split(/\\s+/).filter(Boolean); return words.length > max ? words.slice(0,max).join(" ") : text; };
+  $("observaciones").addEventListener("input", function(){ this.value = limitWords(this.value, 1000); $("counter").textContent = `${this.value.trim().split(/\\s+/).filter(Boolean).length}/1000`; });
+  $("datosNnya").addEventListener("input", function(){ this.value = limitWords(this.value, 500); $("counterNnya").textContent = `${this.value.trim().split(/\\s+/).filter(Boolean).length}/500`; });
+  $("nnyaGesell").addEventListener("input", function(){ this.value = limitWords(this.value, 400); $("counterNnyaGesell").textContent = `${this.value.trim().split(/\\s+/).filter(Boolean).length}/400`; });
+
+  $("habilitarAudienciaGesell").addEventListener("change", function(){ toggleGesell(this.checked); });
+  function toggleGesell(enabled){ const ag = $("audienciaGesell"); const ng = $("nnyaGesell"); if (enabled){ ag.removeAttribute("disabled"); ng.removeAttribute("disabled"); $("counterNnyaGesell").style.display='block'; } else { ag.value = ""; ng.value = ""; ag.setAttribute("disabled","true"); ng.setAttribute("disabled","true"); $("counterNnyaGesell").style.display='none'; } }
+
+  function resetFormCausa(){ $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; }
+
+  function recolectarDatosForm(){
+    const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","audiencias","vencimiento","usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
+    const datos = {};
+    fields.forEach(id=>{ const el = $(id); if(!el) return; if (["date","datetime-local"].includes(el.type)) datos[id] = el.value ? new Date(el.value) : null; else datos[id] = el.value || ""; });
+    return datos;
+  }
+
+  function cargarDatosEnForm(d){
+    const setVal = (id, val)=>{ const el = $(id); if(!el) return; if (val?.seconds){ const date = new Date(val.seconds*1000); if (el.type === "date") el.value = date.toISOString().split("T")[0]; else if (el.type === "datetime-local") el.value = date.toISOString().slice(0,16); else el.value = fmt(val); } else { el.value = val ?? ""; } };
+    initForm();
+    if (d.tipoProceso){ selTipo.value = d.tipoProceso; actualizarJuzgados(); }
+    ["numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya","usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos","nnyaGesell","observaciones"].forEach(k=> setVal(k, d[k]));
+    ["fechaInicio","fechaPase","audiencias","vencimiento","vencimientoRecursos","audienciaGesell"].forEach(k=> setVal(k, d[k]));
+    const habilitar = !!(d.audienciaGesell || d.nnyaGesell); $("habilitarAudienciaGesell").checked = habilitar; toggleGesell(habilitar);
+  }
+
+  // Close modals when clicking outside
+  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modalVer.style.display="none"; });
+
+  // Tabs / Toggle de vistas
+  function activateTab(full=false){ if(full){ tabCompleta.classList.add("active"); tabCompacta.classList.remove("active"); wrapCompleta.style.display="block"; wrapCompacta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista compacta'; } else { tabCompacta.classList.add("active"); tabCompleta.classList.remove("active"); wrapCompacta.style.display="block"; wrapCompleta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista completa'; } }
+  tabCompacta.onclick = ()=>activateTab(false);
+  tabCompleta.onclick = ()=>activateTab(true);
+  btnToggleVista.onclick = ()=>activateTab(wrapCompacta.style.display!=="none");
+
+  poblarFiltroUsuarios([]);
+
+  // ===== Bitácora: agregar nota =====
+  $("btnAgregarNota").onclick = async ()=>{
+    if(!causaActualId){ alert("Seleccione una causa antes de agregar una nota"); return; }
+    const texto = $("nuevaNota").value.trim();
+    if(!texto){ alert("Escribe una nota"); return; }
+    try{
+      await db.collection("causas").doc(causaActualId).collection("seguimiento").add({texto, usuario:"Defensoría", fecha: firebase.firestore.FieldValue.serverTimestamp()});
+      $("nuevaNota").value = "";
+    }catch(e){ console.error("Error al guardar nota:", e); alert("No se pudo guardar la nota. Intenta nuevamente."); }
+    return false;
+  };
+
+  // Init
+  let modo = "nuevo";
+  initForm();
+  suscribirCausas();
   </script>
 </body>
 </html>
