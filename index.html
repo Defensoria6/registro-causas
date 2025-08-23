@@ -269,6 +269,29 @@
   const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
   const fmt = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return ("0"+date.getDate()).slice(-2)+"/"+("0"+(date.getMonth()+1)).slice(-2)+"/"+date.getFullYear(); };
   const fmtShort = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return date.toLocaleDateString()+" "+date.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); };
+  // Helper: expand any date/timestamp into multiple searchable string formats (dd/mm/yyyy, yyyy-mm-dd, etc.)
+  function dateStrings(val){
+    const date = toDate(val);
+    if(!date || isNaN(date)) return [];
+    const y = String(date.getFullYear());
+    const m = String(date.getMonth()+1).padStart(2,'0');
+    const d = String(date.getDate()).padStart(2,'0');
+    const hh = String(date.getHours()).padStart(2,'0');
+    const mm = String(date.getMinutes()).padStart(2,'0');
+    const base = [
+      `${d}/${m}/${y}`,          // dd/mm/yyyy
+      `${y}-${m}-${d}`,          // yyyy-mm-dd
+      `${d}-${m}-${y}`,          // dd-mm-yyyy
+      date.toLocaleDateString(), // locale date
+    ];
+    const withTime = [
+      `${d}/${m}/${y} ${hh}:${mm}`,
+      `${y}-${m}-${d} ${hh}:${mm}`,
+      date.toLocaleString([], {hour:'2-digit', minute:'2-digit'})
+    ];
+    return base.concat(withTime).map(s=>String(s).toLowerCase());
+  }
+
 
   let datosCache = [];
   let causaActualId = null;
@@ -289,20 +312,36 @@
   }
 
   // ===== Filtros =====
-  function filtrarDatos(){
+  
+function filtrarDatos(){
     const q = (buscador.value||"").toLowerCase();
     const est = (filtroEstado.value||"").toLowerCase();
     const usu = (filtroUsuario.value||"").toLowerCase();
+
     return datosCache.filter(d=>{
-      const texto = [d.numCausa,d.caratula,d.tipoProceso,d.juzgado,d.usuarioAsignado,d.estado,d.intervencion,d.recursos,d.recursosContestacion,d.estadoRecursos]
-        .map(x=>(x||"").toString().toLowerCase()).join(" ");
-      const okTexto = !q || texto.includes(q);
-      const okEstado = !est || (d.estado||"").toLowerCase()===est;
-      const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase()===usu;
+      // Campos de texto a considerar (todos los del modal)
+      const textoCampos = [
+        d.numCausa, d.caratula, d.tipoProceso, d.juzgado, d.intervencion,
+        d.datosNnya, d.usuarioAsignado, d.estado, d.recursos, d.recursosContestacion,
+        d.estadoRecursos, d.nnyaGesell, d.observaciones
+      ].map(x => (x||"").toString().toLowerCase()).join(" ");
+
+      // Campos de fecha a considerar (todos los del modal + registro)
+      const fechasCampos = [
+        d.fechaInicio, d.fechaPase, d.audiencias, d.vencimiento,
+        d.vencimientoRecursos, d.audienciaGesell, d.fechaRegistro
+      ];
+      const fechasTexto = fechasCampos.flatMap(dateStrings).join(" ");
+
+      const textoTotal = `${textoCampos} ${fechasTexto}`;
+
+      const okTexto = !q || textoTotal.includes(q);
+      const okEstado = !est || (d.estado||"").toLowerCase() === est;
+      const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase() === usu;
       return okTexto && okEstado && okUsuario;
     });
-  }
-  buscador.oninput = ()=>renderTablas(filtrarDatos());
+}
+buscador.oninput = ()=>renderTablas(filtrarDatos());
   filtroEstado.onchange = ()=>renderTablas(filtrarDatos());
   filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
 
