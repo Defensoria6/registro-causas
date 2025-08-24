@@ -346,12 +346,12 @@ buscador.oninput = ()=>renderTablas(filtrarDatos());
   filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
 
   // ===== Render =====
-  function accionesHTML(id){
+function accionesHTML(id){
     return `<button class="btn-view" data-id="${id}" title="Ver"><i class="fa fa-eye"></i></button>
             <button class="btn-edit" data-id="${id}" title="Editar"><i class="fa fa-pen"></i></button>
             <button class="btn-delete" data-id="${id}" title="Eliminar"><i class="fa fa-trash"></i></button>
-            <button class="btn-view-bitacora" data-id="${id}" title="Bitácora"><i class="fa fa-note-sticky"></i></button>`;
-  }
+            <a href="linea-de-tiempo.html?id=${id}" class="btn-view-bitacora" title="Ver Línea de Tiempo"><i class="fa-solid fa-timeline"></i></a>`;
+}
 
   function renderTablas(data){
     // Compacta
