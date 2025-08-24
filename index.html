@@ -142,7 +142,6 @@
     </aside>
   </div>
 
-  <!-- Modal: ABM Causa -->
   <div id="modal">
     <div class="content">
       <div class="modal-header">
@@ -194,7 +193,6 @@
     </div>
   </div>
 
-  <!-- Modal: Ver Detalle + Bitácora -->
   <div id="modalVer">
     <div class="content">
       <div class="modal-header">
@@ -218,7 +216,6 @@
     </div>
   </div>
 
-  <!-- Firebase v10 COMPAT (no modular) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -228,7 +225,7 @@
     apiKey: "AIzaSyBt6X0u0BpiNPcV2SNPrN-spCmjl2AhZaA",
     authDomain: "causas-defensoria.firebaseapp.com",
     projectId: "causas-defensoria",
-    storageBucket: "causas-defensoria.appspot.com", // ✅ corregido
+    storageBucket: "causas-defensoria.appspot.com",
     messagingSenderId: "186064671470",
     appId: "1:186064671470:web:b58bae5eadbe6e469f19ff"
   };
@@ -308,7 +305,11 @@
       renderTablas(filtrarDatos());
       renderSidebar(arr);
       poblarFiltroUsuarios(arr);
-    }, err=> console.error("onSnapshot causas:", err));
+    }, err=> {
+      console.error("onSnapshot causas:", err);
+      tbody.innerHTML = "<tr><td colspan='8'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
+      tbodyCompleto.innerHTML = "<tr><td colspan='21'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
+    });
   }
 
   // ===== Filtros =====
@@ -350,7 +351,7 @@ function accionesHTML(id){
     return `<button class="btn-view" data-id="${id}" title="Ver"><i class="fa fa-eye"></i></button>
             <button class="btn-edit" data-id="${id}" title="Editar"><i class="fa fa-pen"></i></button>
             <button class="btn-delete" data-id="${id}" title="Eliminar"><i class="fa fa-trash"></i></button>
-            <a href="linea-tiempo.html?id=${id}" class="btn-view-bitacora" title="Ver Línea de Tiempo"><i class="fa-solid fa-timeline"></i></a>;
+            <a href="linea-tiempo.html?id=${id}" class="btn-view-bitacora" title="Ver Línea de Tiempo"><i class="fa-solid fa-timeline"></i></a>`;
 }
 
   function renderTablas(data){
@@ -403,6 +404,7 @@ function accionesHTML(id){
     document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
     document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
     document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>eliminar(b.dataset.id));
+    // CORRECCIÓN: Llamada a la bitácora de la barra lateral solo si es necesario.
     document.querySelectorAll(".btn-view-bitacora").forEach(b=>b.onclick=()=>abrirBitacoraSidebar(b.dataset.id));
   }
 
@@ -479,7 +481,7 @@ function accionesHTML(id){
   }
 
   async function abrirVer(id){
-    causaActualId = id;  // 👈 Aseguramos que quede seteado
+    causaActualId = id;
     try{
       const snap = await db.collection("causas").doc(id).get();
       const d = snap.data();
