@@ -82,6 +82,12 @@
     /* action buttons row */
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .top-actions .actions .btn{display:flex;align-items:center}
+
+    /* Estilos para prioridades */
+    .prioridad-ninguna { color: #000; font-weight: bold; }
+    .prioridad-baja { color: #27ae60; font-weight: bold; }
+    .prioridad-media { color: #f39c12; font-weight: bold; }
+    .prioridad-alta { color: #e74c3c; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -386,6 +392,13 @@ function accionesHTML(id){
     // Completa
     tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='21'>No hay registros</td></tr>";
     data.forEach(d=>{
+      // Determinar la clase CSS según la prioridad
+      let prioridadClass = "";
+      if (d.prioridad === "Ninguna") prioridadClass = "prioridad-ninguna";
+      else if (d.prioridad === "Baja") prioridadClass = "prioridad-baja";
+      else if (d.prioridad === "Media") prioridadClass = "prioridad-media";
+      else if (d.prioridad === "Alta") prioridadClass = "prioridad-alta";
+      
       tbodyCompleto.insertAdjacentHTML("beforeend", `
         <tr>
           <td class="mono">${d.numCausa||""}</td>
@@ -400,7 +413,7 @@ function accionesHTML(id){
           <td>${fmt(d.vencimiento)}</td>
           <td>${d.usuarioAsignado||""}</td>
           <td>${d.estado||""}</td>
-          <td>${d.prioridad||""}</td>
+          <td class="${prioridadClass}">${d.prioridad||""}</td>
           <td>${d.recursos||""}</td>
           <td>${d.recursosContestacion||""}</td>
           <td>${d.estadoRecursos||""}</td>
@@ -444,7 +457,7 @@ function accionesHTML(id){
     renderList(eventos.vrec, listVrec, cVrec, "No hay venc. de recursos próximos");
   }
 
-  // ===== Filtro usuarios =====
+  // ===== Filtro usuarios
   function poblarFiltroUsuarios(data){
     const set = new Set([""]); data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
     const current = filtroUsuario.value; filtroUsuario.innerHTML = "";
