@@ -82,12 +82,6 @@
     /* action buttons row */
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .top-actions .actions .btn{display:flex;align-items:center}
-
-    /* Estilos para prioridades */
-    .prioridad-ninguna { color: #000; font-weight: bold; }
-    .prioridad-baja { color: #27ae60; font-weight: bold; }
-    .prioridad-media { color: #f39c12; font-weight: bold; }
-    .prioridad-alta { color: #e74c3c; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -131,7 +125,7 @@
         <table>
           <thead>
             <tr>
-              <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Fecha Inicio</th><th>Fecha Pase</th><th>Intervención</th><th>Datos NNyA</th><th>Audiencias</th><th>Vencimiento</th><th>Usuario</th><th>Estado</th><th>Prioridad</th><th>Recurso</th><th>Rec. Contestación</th><th>Estado Recursos</th><th>Venc. Recursos</th><th>Aud. Gesell</th><th>NNyA Gesell</th><th>Observaciones</th><th>Registro</th><th>Acciones</th>
+              <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Fecha Inicio</th><th>Fecha Pase</th><th>Intervención</th><th>Datos NNyA</th><th>Audiencias</th><th>Vencimiento</th><th>Usuario</th><th>Estado</th><th>Recurso</th><th>Rec. Contestación</th><th>Estado Recursos</th><th>Venc. Recursos</th><th>Aud. Gesell</th><th>NNyA Gesell</th><th>Observaciones</th><th>Registro</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody id="tbodyCompleto"><tr><td colspan="21">Cargando...</td></tr></tbody>
@@ -168,8 +162,8 @@
             <div class="field"><label for="intervencion">Intervención</label>
               <select id="intervencion">
                 <option>Ministerio Complementario</option><option>Ministerio Principal</option><option>Patrocinante Actor</option>
-                <option>Patrocinante Demandado</option><option>Patrocinante Tercero</option><option value="Defensor de Ausente">Defensor de Ausente</option>
-                <option value="Defensor Oficial Asesor Letrado">Asesor Letrado</option><option>Asesor de incapaces</option> 
+                <option>Patrocinante Demandado</option><option>Patrocinante Tercero</option><option value="Defensor de Ausente">Defensor de Ausente</option><option>Patrocinante presunto incapaz</option></option><option>Patrocinante Tercero</option>
+                <option value="Defensor Oficial Asesor Letrado">Asesor Letrado</option><option>Ministerio Público del incapaz</option><option>Ministerio Público en turno Abril</option><option>Ministerio Público en turno Agosto</option><option>Ministerio Público en turno Diciembre</option>    
               </select>
             </div>
             <div class="field"><label for="datosNnya">Datos de NNyA (máx. 500 palabras)</label><textarea id="datosNnya" disabled></textarea><div class="counter" id="counterNnya" style="display:none">0/500</div></div>
@@ -177,14 +171,6 @@
             <div class="field"><label for="vencimiento">Vencimiento</label><input type="datetime-local" id="vencimiento" /></div>
             <div class="field"><label for="usuarioAsignado">Usuario Asignado</label><select id="usuarioAsignado"></select></div>
             <div class="field"><label for="estado">Estado del Proceso</label><select id="estado"><option>En trámite</option><option>Finalizado</option><option>Archivado</option><option>En Alzada</option></select></div>
-<div class="field"><label for="prioridad">Prioridad de la causa</label>
-              <select id="prioridad">
-                <option value="Ninguna">Ninguna</option>
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-              </select>
-            </div>
             <div class="field"><label for="recursos">Recursos Interpuestos</label>
               <select id="recursos"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select>
             </div>
@@ -341,7 +327,7 @@ function filtrarDatos(){
       // Campos de texto a considerar (todos los del modal)
       const textoCampos = [
         d.numCausa, d.caratula, d.tipoProceso, d.juzgado, d.intervencion,
-        d.datosNnya, d.usuarioAsignado, d.estado, d.prioridad, d.recursos, d.recursosContestacion,
+        d.datosNnya, d.usuarioAsignado, d.estado, d.recursos, d.recursosContestacion,
         d.estadoRecursos, d.nnyaGesell, d.observaciones
       ].map(x => (x||"").toString().toLowerCase()).join(" ");
 
@@ -392,13 +378,6 @@ function accionesHTML(id){
     // Completa
     tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='21'>No hay registros</td></tr>";
     data.forEach(d=>{
-      // Determinar la clase CSS según la prioridad
-      let prioridadClass = "";
-      if (d.prioridad === "Ninguna") prioridadClass = "prioridad-ninguna";
-      else if (d.prioridad === "Baja") prioridadClass = "prioridad-baja";
-      else if (d.prioridad === "Media") prioridadClass = "prioridad-media";
-      else if (d.prioridad === "Alta") prioridadClass = "prioridad-alta";
-      
       tbodyCompleto.insertAdjacentHTML("beforeend", `
         <tr>
           <td class="mono">${d.numCausa||""}</td>
@@ -413,7 +392,6 @@ function accionesHTML(id){
           <td>${fmt(d.vencimiento)}</td>
           <td>${d.usuarioAsignado||""}</td>
           <td>${d.estado||""}</td>
-          <td class="${prioridadClass}">${d.prioridad||""}</td>
           <td>${d.recursos||""}</td>
           <td>${d.recursosContestacion||""}</td>
           <td>${d.estadoRecursos||""}</td>
@@ -457,7 +435,7 @@ function accionesHTML(id){
     renderList(eventos.vrec, listVrec, cVrec, "No hay venc. de recursos próximos");
   }
 
-  // ===== Filtro usuarios
+  // ===== Filtro usuarios =====
   function poblarFiltroUsuarios(data){
     const set = new Set([""]); data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
     const current = filtroUsuario.value; filtroUsuario.innerHTML = "";
@@ -604,7 +582,7 @@ function accionesHTML(id){
   function resetFormCausa(){ $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; }
 
   function recolectarDatosForm(){
-    const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","audiencias","vencimiento","usuarioAsignado","estado","prioridad","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
+    const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","audiencias","vencimiento","usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
     const datos = {};
     fields.forEach(id=>{ const el = $(id); if(!el) return; if (["date","datetime-local"].includes(el.type)) datos[id] = el.value ? new Date(el.value) : null; else datos[id] = el.value || ""; });
     return datos;
@@ -614,7 +592,7 @@ function accionesHTML(id){
     const setVal = (id, val)=>{ const el = $(id); if(!el) return; if (val?.seconds){ const date = new Date(val.seconds*1000); if (el.type === "date") el.value = date.toISOString().split("T")[0]; else if (el.type === "datetime-local") el.value = date.toISOString().slice(0,16); else el.value = val; } else { el.value = val ?? ""; } };
     initForm();
     if (d.tipoProceso){ selTipo.value = d.tipoProceso; actualizarJuzgados(); }
-    ["numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya","usuarioAsignado","estado","prioridad","recursos","recursosContestacion","estadoRecursos","nnyaGesell","observaciones"].forEach(k=> setVal(k, d[k]));
+    ["numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya","usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos","nnyaGesell","observaciones"].forEach(k=> setVal(k, d[k]));
     ["fechaInicio","fechaPase","audiencias","vencimiento","vencimientoRecursos","audienciaGesell"].forEach(k=> setVal(k, d[k]));
     const habilitar = !!(d.audienciaGesell || d.nnyaGesell); $("habilitarAudienciaGesell").checked = habilitar; toggleGesell(habilitar);
   }
