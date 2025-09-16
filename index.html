@@ -82,6 +82,21 @@
     /* action buttons row */
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .top-actions .actions .btn{display:flex;align-items:center}
+    
+    /* Prioridad styling */
+    .prioridad-pill{
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .prioridad-baja{background-color: var(--success);}
+    .prioridad-media{background-color: var(--warning);}
+    .prioridad-alta{background-color: var(--danger);}
+    .prioridad-ninguna{background-color: var(--muted);}
   </style>
 </head>
 <body>
@@ -96,6 +111,13 @@
           </select>
           <select id="filtroUsuario" class="simple">
             <option value="">Usuario (todos)</option>
+          </select>
+          <select id="filtroPrioridad" class="simple">
+            <option value="">Prioridad (todas)</option>
+            <option value="ninguna">Ninguna</option>
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
           </select>
         </div>
         <div class="actions">
@@ -114,10 +136,10 @@
         <table>
           <thead>
             <tr>
-              <th class="nowrap">N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Usuario</th><th>Estado</th><th class="nowrap">Registro</th><th>Acciones</th>
+              <th class="nowrap">N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Usuario</th><th>Estado</th><th>Prioridad</th><th class="nowrap">Registro</th><th>Acciones</th>
             </tr>
           </thead>
-          <tbody id="tbodyCausas"><tr><td colspan="8">Cargando...</td></tr></tbody>
+          <tbody id="tbodyCausas"><tr><td colspan="9">Cargando...</td></tr></tbody>
         </table>
       </div>
 
@@ -125,10 +147,10 @@
         <table>
           <thead>
             <tr>
-              <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Fecha Inicio</th><th>Fecha Pase</th><th>Intervención</th><th>Datos NNyA</th><th>Audiencias</th><th>Vencimiento</th><th>Usuario</th><th>Estado</th><th>Recurso</th><th>Rec. Contestación</th><th>Estado Recursos</th><th>Venc. Recursos</th><th>Aud. Gesell</th><th>NNyA Gesell</th><th>Observaciones</th><th>Registro</th><th>Acciones</th>
+              <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Fecha Inicio</th><th>Fecha Pase</th><th>Intervención</th><th>Datos NNyA</th><th>Audiencias</th><th>Vencimiento</th><th>Usuario</th><th>Estado</th><th>Prioridad</th><th>Recurso</th><th>Rec. Contestación</th><th>Estado Recursos</th><th>Venc. Recursos</th><th>Aud. Gesell</th><th>NNyA Gesell</th><th>Observaciones</th><th>Registro</th><th>Acciones</th>
             </tr>
           </thead>
-          <tbody id="tbodyCompleto"><tr><td colspan="21">Cargando...</td></tr></tbody>
+          <tbody id="tbodyCompleto"><tr><td colspan="22">Cargando...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -171,6 +193,14 @@
             <div class="field"><label for="vencimiento">Vencimiento</label><input type="datetime-local" id="vencimiento" /></div>
             <div class="field"><label for="usuarioAsignado">Usuario Asignado</label><select id="usuarioAsignado"></select></div>
             <div class="field"><label for="estado">Estado del Proceso</label><select id="estado"><option>En trámite</option><option>Finalizado</option><option>Archivado</option><option>En Alzada</option></select></div>
+            <div class="field"><label for="prioridad">Prioridad</label>
+              <select id="prioridad" class="simple">
+                <option value="Ninguna"><strong>Ninguna</strong> (gris)</option>
+                <option value="Baja"><strong>Baja</strong> (verde)</option>
+                <option value="Media"><strong>Media</strong> (naranja)</option>
+                <option value="Alta"><strong>Alta</strong> (roja)</option>
+              </select>
+            </div>
             <div class="field"><label for="recursos">Recursos Interpuestos</label>
               <select id="recursos"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select>
             </div>
@@ -245,6 +275,7 @@
   const buscador = $("buscador");
   const filtroEstado = $("filtroEstado");
   const filtroUsuario = $("filtroUsuario");
+  const filtroPrioridad = $("filtroPrioridad");
   
   // New note section
   const notaBitacora = $("notaBitacora");
@@ -295,6 +326,14 @@
     return base.concat(withTime).map(s=>String(s).toLowerCase());
   }
 
+  const prioridadClase = (p)=>{
+    p = (p || "Ninguna").toLowerCase();
+    if(p === "alta") return "prioridad-alta";
+    if(p === "media") return "prioridad-media";
+    if(p === "baja") return "prioridad-baja";
+    return "prioridad-ninguna";
+  };
+
 
   let datosCache = [];
   let causaActualId = null;
@@ -311,8 +350,8 @@
       poblarFiltroUsuarios(arr);
     }, err=> {
       console.error("onSnapshot causas:", err);
-      tbody.innerHTML = "<tr><td colspan='8'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
-      tbodyCompleto.innerHTML = "<tr><td colspan='21'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='9'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
+      tbodyCompleto.innerHTML = "<tr><td colspan='22'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
     });
   }
 
@@ -322,13 +361,14 @@ function filtrarDatos(){
     const q = (buscador.value||"").toLowerCase();
     const est = (filtroEstado.value||"").toLowerCase();
     const usu = (filtroUsuario.value||"").toLowerCase();
+    const prio = (filtroPrioridad.value||"").toLowerCase();
 
     return datosCache.filter(d=>{
       // Campos de texto a considerar (todos los del modal)
       const textoCampos = [
         d.numCausa, d.caratula, d.tipoProceso, d.juzgado, d.intervencion,
         d.datosNnya, d.usuarioAsignado, d.estado, d.recursos, d.recursosContestacion,
-        d.estadoRecursos, d.nnyaGesell, d.observaciones
+        d.estadoRecursos, d.nnyaGesell, d.observaciones, d.prioridad
       ].map(x => (x||"").toString().toLowerCase()).join(" ");
 
       // Campos de fecha a considerar (todos los del modal + registro)
@@ -343,12 +383,14 @@ function filtrarDatos(){
       const okTexto = !q || textoTotal.includes(q);
       const okEstado = !est || (d.estado||"").toLowerCase() === est;
       const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase() === usu;
-      return okTexto && okEstado && okUsuario;
+      const okPrioridad = !prio || (d.prioridad||"").toLowerCase() === prio;
+      return okTexto && okEstado && okUsuario && okPrioridad;
     });
 }
 buscador.oninput = ()=>renderTablas(filtrarDatos());
   filtroEstado.onchange = ()=>renderTablas(filtrarDatos());
   filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
+  filtroPrioridad.onchange = ()=>renderTablas(filtrarDatos());
 
   // ===== Render =====
 function accionesHTML(id){
@@ -360,7 +402,7 @@ function accionesHTML(id){
 
   function renderTablas(data){
     // Compacta
-    tbody.innerHTML = data.length ? "" : "<tr><td colspan='8'>No hay registros</td></tr>";
+    tbody.innerHTML = data.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
     data.forEach(d=>{
       tbody.insertAdjacentHTML("beforeend", `
         <tr>
@@ -370,13 +412,14 @@ function accionesHTML(id){
           <td>${d.juzgado||""}</td>
           <td>${d.usuarioAsignado||""}</td>
           <td>${d.estado||""}</td>
+          <td><span class="prioridad-pill ${prioridadClase(d.prioridad)}">${d.prioridad||"Ninguna"}</span></td>
           <td class="nowrap">${fmt(d.fechaRegistro)}</td>
           <td class="nowrap">${accionesHTML(d.id)}</td>
         </tr>`);
     });
 
     // Completa
-    tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='21'>No hay registros</td></tr>";
+    tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='22'>No hay registros</td></tr>";
     data.forEach(d=>{
       tbodyCompleto.insertAdjacentHTML("beforeend", `
         <tr>
@@ -392,6 +435,7 @@ function accionesHTML(id){
           <td>${fmt(d.vencimiento)}</td>
           <td>${d.usuarioAsignado||""}</td>
           <td>${d.estado||""}</td>
+          <td><span class="prioridad-pill ${prioridadClase(d.prioridad)}">${d.prioridad||"Ninguna"}</span></td>
           <td>${d.recursos||""}</td>
           <td>${d.recursosContestacion||""}</td>
           <td>${d.estadoRecursos||""}</td>
@@ -553,6 +597,7 @@ function accionesHTML(id){
   const selTipo = $("tipoProceso");
   const selJuz = $("juzgado");
   const selUsu = $("usuarioAsignado");
+  const selPrioridad = $("prioridad");
 
   function initForm(){
     const tipos = ["Administrativo","Civil","Penal","Laboral","Familia","Violencia Familiar","Paz"];
@@ -579,10 +624,10 @@ function accionesHTML(id){
   $("habilitarAudienciaGesell").addEventListener("change", function(){ toggleGesell(this.checked); });
   function toggleGesell(enabled){ const ag = $("audienciaGesell"); const ng = $("nnyaGesell"); if (enabled){ ag.removeAttribute("disabled"); ng.removeAttribute("disabled"); $("counterNnyaGesell").style.display='block'; } else { ag.value = ""; ng.value = ""; ag.setAttribute("disabled","true"); ng.setAttribute("disabled","true"); $("counterNnyaGesell").style.display='none'; } }
 
-  function resetFormCausa(){ $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; }
+  function resetFormCausa(){ $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; selPrioridad.value = "Ninguna"; }
 
   function recolectarDatosForm(){
-    const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","audiencias","vencimiento","usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
+    const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","audiencias","vencimiento","usuarioAsignado","estado","prioridad","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
     const datos = {};
     fields.forEach(id=>{ const el = $(id); if(!el) return; if (["date","datetime-local"].includes(el.type)) datos[id] = el.value ? new Date(el.value) : null; else datos[id] = el.value || ""; });
     return datos;
@@ -592,7 +637,7 @@ function accionesHTML(id){
     const setVal = (id, val)=>{ const el = $(id); if(!el) return; if (val?.seconds){ const date = new Date(val.seconds*1000); if (el.type === "date") el.value = date.toISOString().split("T")[0]; else if (el.type === "datetime-local") el.value = date.toISOString().slice(0,16); else el.value = val; } else { el.value = val ?? ""; } };
     initForm();
     if (d.tipoProceso){ selTipo.value = d.tipoProceso; actualizarJuzgados(); }
-    ["numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya","usuarioAsignado","estado","recursos","recursosContestacion","estadoRecursos","nnyaGesell","observaciones"].forEach(k=> setVal(k, d[k]));
+    ["numCausa","caratula","tipoProceso","juzgado","intervencion","datosNnya","usuarioAsignado","estado","prioridad","recursos","recursosContestacion","estadoRecursos","nnyaGesell","observaciones"].forEach(k=> setVal(k, d[k]));
     ["fechaInicio","fechaPase","audiencias","vencimiento","vencimientoRecursos","audienciaGesell"].forEach(k=> setVal(k, d[k]));
     const habilitar = !!(d.audienciaGesell || d.nnyaGesell); $("habilitarAudienciaGesell").checked = habilitar; toggleGesell(habilitar);
   }
