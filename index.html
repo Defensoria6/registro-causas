@@ -52,8 +52,8 @@
     .event .when{font-weight:600}
     .k{color:#6b7280}
 
-    #modal,#modalVer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:10}
-    #modal .content,#modalVer .content{background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 25px rgba(0,0,0,0.2);animation:fadeIn .25s ease}
+    #modal,#modalVer,#confirmModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:10}
+    #modal .content,#modalVer .content,#confirmModal .content{background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 25px rgba(0,0,0,0.2);animation:fadeIn .25s ease}
     @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
     /* sticky areas */
@@ -97,6 +97,33 @@
     .prioridad-media{background-color: var(--warning);}
     .prioridad-alta{background-color: var(--danger);}
     .prioridad-ninguna{background-color: var(--muted);}
+
+    /* New confirmation modal */
+    #confirmModal .content {
+      max-width: 400px;
+      padding: 24px;
+      text-align: center;
+      gap: 16px;
+    }
+    #confirmModal h3 {
+      margin: 0;
+      color: var(--danger);
+      font-size: 1.5rem;
+    }
+    #confirmModal p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    #confirmModal .actions-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    #confirmModal .actions-row .btn {
+      flex-grow: 1;
+    }
   </style>
 </head>
 <body>
@@ -243,6 +270,17 @@
         <a href="https://defensoria6.github.io/linea-tiempo/" id="btnVerLineaTiempo" class="btn btn-view"><i class="fa-solid fa-timeline"></i> Ver Línea de Tiempo</a>
         <button id="btnCerrarVer" class="btn btn-ghost"><i class="fa fa-xmark"></i>Cerrar</button>
         <button id="btnPrintRegistro" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Registro</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal">
+    <div class="content">
+      <h3>¿Estás seguro?</h3>
+      <p>Esta acción eliminará el registro de forma permanente. No se puede deshacer.</p>
+      <div class="actions-row">
+        <button id="btnConfirmarEliminar" class="btn btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
+        <button id="btnCancelarEliminar" class="btn btn-ghost"><i class="fa fa-xmark"></i> Cancelar</button>
       </div>
     </div>
   </div>
@@ -451,7 +489,7 @@ function accionesHTML(id){
     // Bind actions
     document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
     document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
-    document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>eliminar(b.dataset.id));
+    document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>abrirConfirmarEliminar(b.dataset.id));
   }
 
   // ===== Sidebar (eventos próximos) =====
@@ -520,11 +558,36 @@ function accionesHTML(id){
       if (snap.exists){ cargarDatosEnForm(snap.data()); modal.style.display = "flex"; }
     }catch(e){ console.error(e); alert("No se pudo abrir el registro"); }
   }
+  
+  // Nuevo: Modal de confirmación para eliminar
+  let idParaEliminar = null;
+  const confirmModal = $("confirmModal");
+  const btnConfirmarEliminar = $("btnConfirmarEliminar");
+  const btnCancelarEliminar = $("btnCancelarEliminar");
 
-  async function eliminar(id){
-    if (!confirm("¿Eliminar registro?")) return;
-    try{ await db.collection("causas").doc(id).delete(); }catch(e){ console.error(e); alert("No se pudo eliminar"); }
+  function abrirConfirmarEliminar(id) {
+    idParaEliminar = id;
+    confirmModal.style.display = "flex";
   }
+
+  async function eliminarRegistro() {
+    if (!idParaEliminar) return;
+    try {
+      await db.collection("causas").doc(idParaEliminar).delete();
+      confirmModal.style.display = "none";
+      idParaEliminar = null;
+    } catch (e) {
+      console.error(e);
+      alert("No se pudo eliminar el registro.");
+    }
+  }
+
+  btnConfirmarEliminar.onclick = eliminarRegistro;
+  btnCancelarEliminar.onclick = () => {
+    confirmModal.style.display = "none";
+    idParaEliminar = null;
+  };
+  // Fin del nuevo código
 
   async function abrirVer(id){
     causaActualId = id;
@@ -643,7 +706,7 @@ function accionesHTML(id){
   }
 
   // Close modals when clicking outside
-  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modalVer.style.display="none"; });
+  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modalVer.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
 
   // Tabs / Toggle de vistas
   function activateTab(full=false){ if(full){ tabCompleta.classList.add("active"); tabCompacta.classList.remove("active"); wrapCompleta.style.display="block"; wrapCompacta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista compacta'; } else { tabCompacta.classList.add("active"); tabCompleta.classList.remove("active"); wrapCompacta.style.display="block"; wrapCompleta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista completa'; } }
