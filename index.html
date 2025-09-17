@@ -124,9 +124,33 @@
     #confirmModal .actions-row .btn {
       flex-grow: 1;
     }
+
+    /* floating alert */
+    .floating-alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--danger);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .floating-alert.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
+  <div class="floating-alert" id="floating-alert"></div>
   <div class="container">
     <div class="main">
       <div class="top-actions">
@@ -336,6 +360,10 @@
   const wrapCompacta = $("wrapCompacta");
   const wrapCompleta = $("wrapCompleta");
   const btnToggleVista = $("btnToggleVista");
+  const numCausaInput = $("numCausa");
+
+  // Floating alert
+  const floatingAlert = $("floating-alert");
 
   // ===== Utils =====
   const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
@@ -526,27 +554,78 @@ function accionesHTML(id){
   }
 
   // ===== ABM Causas =====
-  $("btnNuevo").onclick = ()=>{ modo = "nuevo"; resetFormCausa(); editId.value = ""; tituloForm.textContent = "Nuevo Expediente"; modal.style.display = "flex"; };
+  $("btnNuevo").onclick = ()=>{ 
+    modo = "nuevo"; 
+    resetFormCausa(); 
+    editId.value = ""; 
+    tituloForm.textContent = "Nuevo Expediente"; 
+    modal.style.display = "flex"; 
+  };
 
   $("btnGuardar").onclick = async ()=>{
     const datos = recolectarDatosForm();
-    if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) { alert("Completa los campos obligatorios (N° Expediente, Carátula, Tipo y Juzgado)."); return; }
+    if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) { 
+      alert("Completa los campos obligatorios (N° Expediente, Carátula, Tipo y Juzgado)."); 
+      return; 
+    }
+
+    // Deshabilita el botón para prevenir duplicados
+    const btnGuardar = $("btnGuardar");
+    btnGuardar.disabled = true;
+
     try{
       if (modo==="nuevo"){
+        // Verificar duplicidad antes de guardar solo en modo "nuevo"
+        const numCausaExistente = datosCache.some(d => d.numCausa === datos.numCausa);
+        if (numCausaExistente) {
+          mostrarAlertaFlotante("Esta causa ya se encuentra registrada en el listado. Vuelva a escribir nuevamente.");
+          btnGuardar.disabled = false; // Vuelve a habilitar el botón
+          return;
+        }
+
         await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
       }else{
         await db.collection("causas").doc(editId.value).update(datos);
       }
       modal.style.display = "none";
-    }catch(e){ console.error(e); alert("No se pudo guardar. Revisa la consola."); }
+    }catch(e){ 
+      console.error(e); 
+      alert("No se pudo guardar. Revisa la consola."); 
+      btnGuardar.disabled = false; // Habilita el botón si hay un error
+    }
   };
 
-  $("btnEliminar").onclick = async ()=>{
+  // Validación de número de causa al perder el foco
+  numCausaInput.addEventListener("blur", () => {
+    if (modo === "nuevo") {
+      const numCausa = numCausaInput.value.trim();
+      if (numCausa) {
+        const numCausaExistente = datosCache.some(d => d.numCausa === numCausa);
+        if (numCausaExistente) {
+          mostrarAlertaFlotante("Esta causa ya se encuentra registrada en el listado. Vuelva a escribir nuevamente.");
+        }
+      }
+    }
+  });
+
+  // Función para mostrar la alerta flotante
+  function mostrarAlertaFlotante(mensaje) {
+    floatingAlert.textContent = mensaje;
+    floatingAlert.classList.add("show");
+    setTimeout(() => {
+      floatingAlert.classList.remove("show");
+    }, 5000); // 5 segundos
+  }
+
+  // Botón "Eliminar" del modal de edición
+  $("btnEliminar").onclick = ()=>{
     const id = editId.value;
-    if (!id){ alert("Abrí un expediente para poder eliminarlo."); return; }
-    if (!confirm("¿Eliminar registro?")) return;
-    try{ await db.collection("causas").doc(id).delete(); modal.style.display = "none"; }
-    catch(e){ console.error(e); alert("No se pudo eliminar"); }
+    if (id) {
+      modal.style.display = "none";
+      abrirConfirmarEliminar(id);
+    } else {
+      alert("No hay un expediente seleccionado para eliminar.");
+    }
   };
 
   $("btnCancelar").onclick = ()=>{ if (confirm("¿Cancelar? Se perderán los cambios no guardados.")) modal.style.display = "none"; };
@@ -560,34 +639,40 @@ function accionesHTML(id){
   }
   
   // Nuevo: Modal de confirmación para eliminar
-  let idParaEliminar = null;
   const confirmModal = $("confirmModal");
   const btnConfirmarEliminar = $("btnConfirmarEliminar");
   const btnCancelarEliminar = $("btnCancelarEliminar");
-
+  
+  // CORRECCIÓN FINAL: Guardar el ID en el data-attribute del botón
   function abrirConfirmarEliminar(id) {
-    idParaEliminar = id;
+    btnConfirmarEliminar.dataset.idToDelete = id;
     confirmModal.style.display = "flex";
   }
 
-  async function eliminarRegistro() {
-    if (!idParaEliminar) return;
-    try {
-      await db.collection("causas").doc(idParaEliminar).delete();
-      confirmModal.style.display = "none";
-      idParaEliminar = null;
-    } catch (e) {
-      console.error(e);
-      alert("No se pudo eliminar el registro.");
+  // CORRECCIÓN FINAL: Obtener el ID directamente del data-attribute del botón
+  btnConfirmarEliminar.addEventListener("click", async () => {
+    const idToDelete = btnConfirmarEliminar.dataset.idToDelete;
+    if (!idToDelete) {
+      console.error("No se encontró el ID para eliminar. Inténtelo de nuevo.");
+      alert("No se encontró el ID para eliminar. Inténtelo de nuevo.");
+      return;
     }
-  }
 
-  btnConfirmarEliminar.onclick = eliminarRegistro;
+    try {
+      await db.collection("causas").doc(idToDelete).delete();
+      confirmModal.style.display = "none";
+      btnConfirmarEliminar.dataset.idToDelete = ""; // Limpiar el ID al finalizar
+    } catch (e) {
+      console.error("Error al eliminar el expediente:", e);
+      alert("No se pudo eliminar el registro. Revisa la consola para más detalles.");
+    }
+  });
+
   btnCancelarEliminar.onclick = () => {
     confirmModal.style.display = "none";
-    idParaEliminar = null;
+    btnConfirmarEliminar.dataset.idToDelete = ""; // Limpiar el ID al cancelar
   };
-  // Fin del nuevo código
+  // Fin de la corrección
 
   async function abrirVer(id){
     causaActualId = id;
