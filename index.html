@@ -69,7 +69,7 @@
     #formCausa input:focus,#formCausa textarea:focus,#formCausa select:focus{outline:none;border-color:var(--accent);background:#fff}
     .counter{font-size:.8rem;color:#6b7280;margin-top:4px}
     
-    #agregarNota{margin-top:20px;padding:15px;background:#f0f4f9;border-radius:10px;border:1px solid #ddd;}
+    #agregarNota{margin-top:20px;padding:15px;background:#f0f4f9;border:1px solid #ddd;border-radius:10px;}
     #agregarNota label{font-weight:600;color:var(--primary);display:block;margin-bottom:8px;}
     #agregarNota textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;resize:vertical;}
     #agregarNota button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-top:10px;}
@@ -274,8 +274,7 @@
             <div class="field" style="grid-column:1/-1">
               <label for="audiencias">Audiencias señaladas</label>
               <div id="audiencias-container" class="audiencias-container">
-                <!-- Las audiencias se añadirán dinámicamente aquí -->
-              </div>
+                </div>
               <button type="button" id="btnAgregarAudiencia" class="btn-audiencia"><i class="fa fa-plus"></i> Agregar Audiencia</button>
             </div>
             <div class="field"><label for="vencimiento">Vencimiento</label><input type="datetime-local" id="vencimiento" /></div>
@@ -408,8 +407,8 @@
 
   // ===== Utils =====
   const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
-  const fmt = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return ("0"+date.getDate()).slice(-2)+"/"+("0"+(date.getMonth()+1)).slice(-2)+"/"+date.getFullYear(); };
-  const fmtShort = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return date.toLocaleDateString()+" "+date.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); };
+  const fmt = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return date.toLocaleDateString(); };
+  const fmtShort = (d)=>{ const date = toDate(d); if(!date || isNaN(date)) return ""; return date.toLocaleDateString() + " " + date.toLocaleTimeString(); };
   // Helper: expand any date/timestamp into multiple searchable string formats (dd/mm/yyyy, yyyy-mm-dd, etc.)
   function dateStrings(val){
     const date = toDate(val);
@@ -745,7 +744,7 @@ function accionesHTML(id){
       let contenidoHTML = "";
       pares.forEach(([k,v]) => {
         if (k === "audiencias" && Array.isArray(v)) {
-          contenidoHTML += `<p><strong>${k}:</strong></p>`;
+          contenidoHTML += `<p><strong>Audiencias:</strong></p>`;
           v.forEach(aud => {
             contenidoHTML += `<p style="margin-left: 20px;">${fmtShort(aud)}</p>`;
           });
@@ -964,7 +963,7 @@ function accionesHTML(id){
   btnAgregarAudiencia.onclick = agregarAudiencia;
 
   // Close modals when clicking outside
-  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modalVer.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
+  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modal.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
 
   // Tabs / Toggle de vistas
   function activateTab(full=false){ if(full){ tabCompleta.classList.add("active"); tabCompacta.classList.remove("active"); wrapCompleta.style.display="block"; wrapCompacta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista compacta'; } else { tabCompacta.classList.add("active"); tabCompleta.classList.remove("active"); wrapCompacta.style.display="block"; wrapCompleta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista completa'; } }
