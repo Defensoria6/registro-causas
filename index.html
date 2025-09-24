@@ -34,11 +34,6 @@
     .btn-view{background:var(--primary);color:#fff}
     .btn-ghost{background:#eef2f7;color:#2c3e50}
 
-    .tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-    .tab{padding:8px 12px;border-radius:8px;background:#eef2f7;cursor:pointer;font-size:.88rem}
-    .tab.active{background:var(--primary);color:#fff}
-    .tab-note{font-size:.8rem;color:var(--muted);margin-left:6px}
-
     .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:collapse;min-width:720px}
     th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:.9rem;vertical-align:top;word-break:break-word}
@@ -217,18 +212,12 @@
           </select>
         </div>
         <div class="actions">
-          <button id="btnToggleVista" class="btn btn-ghost"><i class="fa-solid fa-arrows-left-right"></i>Vista completa</button>
           <button id="btnNuevo" class="btn btn-nuevo"><i class="fa fa-plus"></i>Nuevo Expediente</button>
           <button id="btnPrintListado" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Listado</button>
         </div>
       </div>
 
-      <div class="tabs">
-        <div id="tabCompacta" class="tab active">Vista compacta</div>
-        <div id="tabCompleta" class="tab">Vista completa <span class="tab-note">todas las columnas</span></div>
-      </div>
-
-      <div id="wrapCompacta" class="table-wrap">
+      <div class="table-wrap">
         <table>
           <thead>
             <tr>
@@ -236,17 +225,6 @@
             </tr>
           </thead>
           <tbody id="tbodyCausas"><tr><td colspan="9">Cargando...</td></tr></tbody>
-        </table>
-      </div>
-
-      <div id="wrapCompleta" class="table-wrap" style="display:none;margin-top:10px">
-        <table>
-          <thead>
-            <tr>
-              <th>N°</th><th>Carátula</th><th>Tipo</th><th>Juzgado</th><th>Fecha Inicio</th><th>Fecha Pase</th><th>Intervención</th><th>Datos NNyA</th><th>Audiencias</th><th>Vencimiento</th><th>Usuario</th><th>Estado</th><th>Prioridad</th><th>Recurso</th><th>Rec. Contestación</th><th>Estado Recursos</th><th>Venc. Recursos</th><th>Aud. Gesell</th><th>NNyA Gesell</th><th>Observaciones</th><th>Registro</th><th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyCompleto"><tr><td colspan="22">Cargando...</td></tr></tbody>
         </table>
       </div>
       
@@ -381,7 +359,6 @@
   // ===== Helpers UI =====
   const $ = (id)=>document.getElementById(id);
   const tbody = $("tbodyCausas");
-  const tbodyCompleto = $("tbodyCompleto");
   const modal = $("modal");
   const modalVer = $("modalVer");
   const verContenido = $("verContenido");
@@ -405,15 +382,8 @@
   const cVenc = $("countVenc");
   const cVrec = $("countVrec");
 
-  const tabCompacta = $("tabCompacta");
-  const tabCompleta = $("tabCompleta");
-  const wrapCompacta = $("wrapCompacta");
-  const wrapCompleta = $("wrapCompleta");
-  const btnToggleVista = $("btnToggleVista");
   const numCausaInput = $("numCausa");
-
   const floatingAlert = $("floating-alert");
-
   const audienciasContainer = $("audiencias-container");
   const btnAgregarAudiencia = $("btnAgregarAudiencia");
 
@@ -483,7 +453,6 @@
     }, err=> {
       console.error("onSnapshot causas:", err);
       tbody.innerHTML = "<tr><td colspan='9'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
-      tbodyCompleto.innerHTML = "<tr><td colspan='22'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
     });
   }
 
@@ -555,39 +524,6 @@
           <td>${d.estado||""}</td>
           <td><span class="prioridad-pill ${prioridadClase(d.prioridad)}">${d.prioridad||"Ninguna"}</span></td>
           <td class="nowrap">${formatearFecha(d.fechaRegistro, false)}</td>
-          <td class="nowrap">${accionesHTML(d.id)}</td>
-        </tr>`);
-    });
-
-    tbodyCompleto.innerHTML = paginatedData.length ? "" : "<tr><td colspan='22'>No hay registros</td></tr>";
-    paginatedData.forEach(d=>{
-      const audienciasHTML = Array.isArray(d.audiencias) && d.audiencias.length > 0 
-        ? d.audiencias.map(aud => `<div>${formatearFecha(aud, true)}</div>`).join("")
-        : (d.audiencias ? formatearFecha(d.audiencias, true) : "");
-        
-      tbodyCompleto.insertAdjacentHTML("beforeend", `
-        <tr>
-          <td class="mono">${d.numCausa||""}</td>
-          <td>${d.caratula||""}</td>
-          <td>${d.tipoProceso||""}</td>
-          <td>${d.juzgado||""}</td>
-          <td>${formatearFecha(d.fechaInicio, false)}</td>
-          <td>${formatearFecha(d.fechaPase, true)}</td>
-          <td>${d.intervencion||""}</td>
-          <td>${d.datosNnya||""}</td>
-          <td>${audienciasHTML}</td>
-          <td>${formatearFecha(d.vencimiento, true)}</td>
-          <td>${d.usuarioAsignado||""}</td>
-          <td>${d.estado||""}</td>
-          <td><span class="prioridad-pill ${prioridadClase(d.prioridad)}">${d.prioridad||"Ninguna"}</span></td>
-          <td>${d.recursos||""}</td>
-          <td>${d.recursosContestacion||""}</td>
-          <td>${d.estadoRecursos||""}</td>
-          <td>${formatearFecha(d.vencimientoRecursos, true)}</td>
-          <td>${formatearFecha(d.audienciaGesell, true)}</td>
-          <td>${d.nnyaGesell||""}</td>
-          <td>${d.observaciones||""}</td>
-          <td>${formatearFecha(d.fechaRegistro, false)}</td>
           <td class="nowrap">${accionesHTML(d.id)}</td>
         </tr>`);
     });
@@ -847,7 +783,7 @@
   btnAgregarNota.onclick = agregarNota;
   $("btnCerrarVer").onclick = ()=> modalVer.style.display = "none";
   const printSection = (html)=>{ const w = window.open("","_blank","width=900,height=700"); w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`); w.document.close(); w.focus(); w.print(); };
-  $("btnPrintListado").onclick = ()=>{ const activeTbody = wrapCompleta.style.display!=="none" ? tbodyCompleto : tbody; const head = activeTbody.closest("table").querySelector("thead").outerHTML; const body = activeTbody.outerHTML; printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`); };
+  $("btnPrintListado").onclick = ()=>{ const head = tbody.closest("table").querySelector("thead").outerHTML; const body = tbody.outerHTML; printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`); };
   $("btnPrintFechas").onclick = ()=>{ const html = `<h3>Audiencias</h3>${listAud.outerHTML}<h3>Cámara Gesell</h3>${listGes.outerHTML}<h3>Vencimientos</h3>${listVenc.outerHTML}<h3>Venc. de Recursos</h3>${listVrec.outerHTML}`; printSection(html); };
   $("btnPrintForm").onclick = ()=> printSection($("formCausa").outerHTML);
   $("btnPrintRegistro").onclick = ()=> printSection($("verContenido").outerHTML);
@@ -961,10 +897,6 @@
   function agregarAudiencia() { audienciasContainer.appendChild(crearAudienciaItem()); }
   btnAgregarAudiencia.onclick = agregarAudiencia;
   window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modal.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
-  function activateTab(full=false){ if(full){ tabCompleta.classList.add("active"); tabCompacta.classList.remove("active"); wrapCompleta.style.display="block"; wrapCompacta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista compacta'; } else { tabCompacta.classList.add("active"); tabCompleta.classList.remove("active"); wrapCompacta.style.display="block"; wrapCompleta.style.display="none"; btnToggleVista.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>Vista completa'; } }
-  tabCompacta.onclick = ()=>activateTab(false);
-  tabCompleta.onclick = ()=>activateTab(true);
-  btnToggleVista.onclick = ()=>activateTab(wrapCompacta.style.display!=="none");
   poblarFiltroUsuarios([]);
   let modo = "nuevo";
   initForm();
