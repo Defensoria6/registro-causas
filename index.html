@@ -387,10 +387,13 @@
   const audienciasContainer = $("audiencias-container");
   const btnAgregarAudiencia = $("btnAgregarAudiencia");
 
-  // ===== PAGINACIÓN =====
-  let currentPage = 1;
+  // ===== PAGINACIÓN del lado del Servidor y Realtime =====
   const recordsPerPage = 20;
-
+  let firstVisible = null;
+  let lastVisible = null;
+  let queryDirection = 'next';
+  let history = []; // Historial para la navegación 'atrás'
+  
   // ===== Utils (SECCIÓN CORREGIDA) =====
   const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
   
@@ -440,59 +443,94 @@
   let causaActualId = null;
   let unsubCausas = null;
 
-  // ===== Realtime: causas =====
-  function suscribirCausas(){
+  // ===== Lógica de paginación y carga de datos desde el servidor =====
+  function suscribirCausas() {
     if (unsubCausas) unsubCausas();
-    unsubCausas = db.collection("causas").orderBy("fechaRegistro","desc").onSnapshot(snap=>{
-      const arr=[]; snap.forEach(d=>arr.push({id:d.id, ...d.data()}));
-      datosCache = arr;
-      currentPage = 1; // Resetear a la página 1 en cada nueva carga de datos
-      renderTablas(filtrarDatos());
-      renderSidebar(arr);
-      poblarFiltroUsuarios(arr);
-    }, err=> {
-      console.error("onSnapshot causas:", err);
-      tbody.innerHTML = "<tr><td colspan='9'>Error al cargar los datos. Verifique la consola para más detalles.</td></tr>";
-    });
+
+    let query = db.collection("causas").orderBy("fechaRegistro", "desc").limit(recordsPerPage);
+
+    if (queryDirection === 'next' && lastVisible) {
+      query = query.startAfter(lastVisible);
+    } else if (queryDirection === 'prev' && firstVisible) {
+      query = query.endBefore(firstVisible).limitToLast(recordsPerPage);
+    }
+
+    unsubCausas = query.onSnapshot(
+      snap => {
+        if (snap.empty) {
+          tbody.innerHTML = "<tr><td colspan='9'>No hay más registros</td></tr>";
+          renderPaginacion(0);
+          return;
+        }
+
+        const data = [];
+        snap.forEach(d => data.push({
+          id: d.id,
+          ...d.data()
+        }));
+
+        // Actualizar los marcadores para la siguiente página
+        firstVisible = snap.docs[0];
+        lastVisible = snap.docs[snap.docs.length - 1];
+
+        if (queryDirection === 'next') {
+          history.push(firstVisible);
+        } else if (queryDirection === 'prev' && history.length > 1) {
+          history.pop();
+        }
+
+        renderTablas(data);
+        renderPaginacion(data.length);
+
+        // Actualizar el sidebar y filtros después de la primera carga
+        if (history.length <= 1) {
+          db.collection("causas").orderBy("fechaRegistro", "desc").get().then(fullSnap => {
+            const arr = [];
+            fullSnap.forEach(d => arr.push({
+              id: d.id,
+              ...d.data()
+            }));
+            datosCache = arr; // Mantener un cache completo para los filtros del cliente
+            renderSidebar(arr);
+            poblarFiltroUsuarios(arr);
+          });
+        }
+      },
+      err => {
+        console.error("onSnapshot causas:", err);
+        tbody.innerHTML = "<tr><td colspan='9'>Error al cargar los datos.</td></tr>";
+      }
+    );
   }
 
   // ===== Filtros =====
-  function filtrarDatos(){
-    const q = (buscador.value||"").toLowerCase();
-    const est = (filtroEstado.value||"").toLowerCase();
-    const usu = (filtroUsuario.value||"").toLowerCase();
-    const prio = (filtroPrioridad.value||"").toLowerCase();
-
-    return datosCache.filter(d=>{
-      const textoCampos = [
-        d.numCausa, d.caratula, d.tipoProceso, d.juzgado, d.intervencion,
-        d.datosNnya, d.usuarioAsignado, d.estado, d.recursos, d.recursosContestacion,
-        d.estadoRecursos, d.nnyaGesell, d.observaciones, d.prioridad
-      ].map(x => (x||"").toString().toLowerCase()).join(" ");
-
-      const fechasCampos = [
-        d.fechaInicio, d.fechaPase, d.vencimiento,
-        d.vencimientoRecursos, d.audienciaGesell, d.fechaRegistro
-      ];
-      
+  function filtrarDatos() {
+    const q = (buscador.value || "").toLowerCase();
+    const est = (filtroEstado.value || "").toLowerCase();
+    const usu = (filtroUsuario.value || "").toLowerCase();
+    const prio = (filtroPrioridad.value || "").toLowerCase();
+    return datosCache.filter(d => {
+      const textoCampos = [d.numCausa, d.caratula, d.tipoProceso, d.juzgado, d.intervencion, d.datosNnya, d.usuarioAsignado, d.estado, d.recursos, d.recursosContestacion, d.estadoRecursos, d.nnyaGesell, d.observaciones, d.prioridad].map(x => (x || "").toString().toLowerCase()).join(" ");
+      const fechasCampos = [d.fechaInicio, d.fechaPase, d.vencimiento, d.vencimientoRecursos, d.audienciaGesell, d.fechaRegistro];
       const audienciasFechas = Array.isArray(d.audiencias) ? d.audiencias : [];
       fechasCampos.push(...audienciasFechas);
-      
       const fechasTexto = fechasCampos.flatMap(dateStrings).join(" ");
       const textoTotal = `${textoCampos} ${fechasTexto}`;
       const okTexto = !q || textoTotal.includes(q);
-      const okEstado = !est || (d.estado||"").toLowerCase() === est;
-      const okUsuario = !usu || (d.usuarioAsignado||"").toLowerCase() === usu;
-      const okPrioridad = !prio || (d.prioridad||"").toLowerCase() === prio;
+      const okEstado = !est || (d.estado || "").toLowerCase() === est;
+      const okUsuario = !usu || (d.usuarioAsignado || "").toLowerCase() === usu;
+      const okPrioridad = !prio || (d.prioridad || "").toLowerCase() === prio;
       return okTexto && okEstado && okUsuario && okPrioridad;
     });
   }
-  
-  const handleFilterChange = () => {
-    currentPage = 1; // Resetear a la primera página al filtrar
-    renderTablas(filtrarDatos());
-  };
 
+  const handleFilterChange = () => {
+    const filteredData = filtrarDatos();
+    renderTablas(filteredData);
+    // Ocultar la paginación del servidor cuando se usan los filtros
+    $("paginacion-container").style.display = filteredData.length > recordsPerPage ? "flex" : "none";
+  };
+  
   buscador.oninput = handleFilterChange;
   filtroEstado.onchange = handleFilterChange;
   filtroUsuario.onchange = handleFilterChange;
@@ -507,13 +545,8 @@
   }
 
   function renderTablas(data){
-    // Lógica de paginación
-    const startIndex = (currentPage - 1) * recordsPerPage;
-    const endIndex = startIndex + recordsPerPage;
-    const paginatedData = data.slice(startIndex, endIndex);
-
-    tbody.innerHTML = paginatedData.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
-    paginatedData.forEach(d=>{
+    tbody.innerHTML = data.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
+    data.forEach(d=>{
       tbody.insertAdjacentHTML("beforeend", `
         <tr>
           <td class="mono">${d.numCausa||""}</td>
@@ -532,45 +565,34 @@
     document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
     document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>abrirConfirmarEliminar(b.dataset.id));
     
-    renderPaginacion(data.length); // Dibujar controles de paginación
+    // Si la tabla se renderiza por un filtro, no se muestra paginación del servidor
+    if ($("paginacion-container").style.display === "none") {
+        renderPaginacion(data.length);
+    }
   }
 
   // ===== PAGINACIÓN: Render y Controles =====
-  function renderPaginacion(totalRecords) {
+  function renderPaginacion(recordsOnPage) {
     const container = $("paginacion-container");
-    const totalPages = Math.ceil(totalRecords / recordsPerPage);
-
-    container.innerHTML = ""; // Limpiar antes de renderizar
-
-    if (totalPages <= 1) {
-      return; // No mostrar paginación si hay una sola página o ninguna
-    }
-
-    const prevDisabled = currentPage === 1 ? 'disabled' : '';
-    const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-
+    container.style.display = "flex";
     container.innerHTML = `
       <div class="page-info">
-        Página <strong>${currentPage}</strong> de <strong>${totalPages}</strong> (Total: ${totalRecords} registros)
+        Mostrando ${recordsOnPage} registros
       </div>
       <div class="nav-buttons">
-        <button id="btnPrevPage" class="btn btn-ghost" ${prevDisabled}><i class="fa fa-arrow-left"></i> Anterior</button>
-        <button id="btnNextPage" class="btn btn-ghost" ${nextDisabled}>Siguiente <i class="fa fa-arrow-right"></i></button>
+        <button id="btnPrevPage" class="btn btn-ghost" ${history.length <= 1 ? 'disabled' : ''}><i class="fa fa-arrow-left"></i> Anterior</button>
+        <button id="btnNextPage" class="btn btn-ghost" ${recordsOnPage < recordsPerPage ? 'disabled' : ''}>Siguiente <i class="fa fa-arrow-right"></i></button>
       </div>
     `;
 
     $("btnPrevPage").onclick = () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTablas(filtrarDatos());
-      }
+      queryDirection = 'prev';
+      suscribirCausas();
     };
 
     $("btnNextPage").onclick = () => {
-      if (currentPage < totalPages) {
-        currentPage++;
-        renderTablas(filtrarDatos());
-      }
+      queryDirection = 'next';
+      suscribirCausas();
     };
   }
 
@@ -899,6 +921,7 @@
   window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modal.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
   poblarFiltroUsuarios([]);
   let modo = "nuevo";
+  
   initForm();
   suscribirCausas();
   </script>
