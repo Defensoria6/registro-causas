@@ -14,23 +14,26 @@
     *{box-sizing:border-box}
     body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#2c3e50;padding:20px}
     h1{margin:0 0 12px;color:var(--primary);text-align:center}
+
     .container{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
     .main{min-width:0}
     .sidebar{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;position:sticky;top:14px}
     .sidebar h2{margin:0 0 10px;font-size:1.05rem;color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:6px}
+
     .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:12px 0}
     .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     input[type="text"], select.simple{padding:8px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:.9rem}
+
     .btn{border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.92rem;transition:.2s;white-space:nowrap;line-height:1.2;display:inline-flex;align-items:center;gap:8px}
     .btn:hover{opacity:.95}
     .btn:disabled{background:#ccc;cursor:not-allowed;opacity:.8}
-    .btn i.fa-spin { animation: fa-spin 1.5s infinite linear; } /* Animación para spinner */
     .btn-nuevo{background:var(--accent);color:#fff}
     .btn-print{background:var(--success);color:#fff}
     .btn-edit{background:var(--warning);color:#fff}
     .btn-delete{background:var(--danger);color:#fff}
     .btn-view{background:var(--primary);color:#fff}
     .btn-ghost{background:#eef2f7;color:#2c3e50}
+
     .table-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:collapse;min-width:720px}
     th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:.9rem;vertical-align:top;word-break:break-word}
@@ -38,52 +41,152 @@
     tr:hover td{background:#f9fbff}
     .nowrap{white-space:nowrap}
     .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+
     .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--tag);font-size:.75rem;margin-left:6px}
     .group{margin-bottom:12px}
     .event{display:flex;gap:8px;align-items:flex-start;background:#f9f9ff;border-left:4px solid var(--accent);padding:6px 8px;border-radius:6px;margin:6px 0}
     .event .when{font-weight:600}
     .k{color:#6b7280}
+
     #modal,#modalVer,#confirmModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center;padding:20px;z-index:10}
     #modal .content,#modalVer .content,#confirmModal .content{background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 25px rgba(0,0,0,0.2);animation:fadeIn .25s ease}
     @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
     .modal-header{position:sticky;top:0;background:var(--primary);color:#fff;padding:12px 16px;font-size:1.1rem;font-weight:600;border-radius:16px 16px 0 0;z-index:5;display:flex;align-items:center;gap:10px;justify-content:center}
     .modal-body{padding:16px 16px 0;overflow-y:auto}
     .controls-form{position:sticky;bottom:0;background:#fff;padding:12px 16px;border-top:1px solid #eee;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;z-index:5}
+
     #formCausa .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:900px){ #formCausa .grid{grid-template-columns:1fr} .container{grid-template-columns:1fr} .sidebar{position:relative;top:auto} }
     #formCausa label{font-weight:600;color:var(--primary);font-size:0.9rem;margin-bottom:4px;display:block}
     #formCausa input,#formCausa textarea,#formCausa select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px;font-size:0.9rem;background:#fafafa;transition:.2s}
     #formCausa input:focus,#formCausa textarea:focus,#formCausa select:focus{outline:none;border-color:var(--accent);background:#fff}
     .counter{font-size:.8rem;color:#6b7280;margin-top:4px}
+    
     #agregarNota{margin-top:20px;padding:15px;background:#f0f4f9;border:1px solid #ddd;border-radius:10px;}
     #agregarNota label{font-weight:600;color:var(--primary);display:block;margin-bottom:8px;}
     #agregarNota textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;resize:vertical;}
     #agregarNota button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-top:10px;}
+
     #verContenido p{margin:.35rem 0;font-size:.92rem}
     #verContenido strong{color:var(--primary)}
     .note{border-left:3px solid #3498db;padding:6px;margin:6px 0;background:#f9fbff;border-radius:6px}
+
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .top-actions .actions .btn{display:flex;align-items:center}
-    .prioridad-pill{display:inline-block;padding:4px 8px;border-radius:6px;font-size:0.8rem;font-weight:bold;color:#fff;text-transform:uppercase;}
+    
+    .prioridad-pill{
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+      text-transform: uppercase;
+    }
     .prioridad-baja{background-color: var(--success);}
     .prioridad-media{background-color: var(--warning);}
     .prioridad-alta{background-color: var(--danger);}
     .prioridad-ninguna{background-color: var(--muted);}
-    #confirmModal .content{max-width:400px;padding:24px;text-align:center;gap:16px;}
-    #confirmModal h3{margin:0;color:var(--danger);font-size:1.5rem;}
-    #confirmModal p{margin:0;color:var(--muted);font-size:0.95rem;}
-    #confirmModal .actions-row{display:flex;justify-content:space-around;gap:12px;margin-top:20px;}
-    #confirmModal .actions-row .btn{flex-grow:1;}
-    .floating-alert{position:fixed;top:20px;left:50%;transform:translateX(-50%);background-color:var(--danger);color:#fff;padding:12px 24px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.2);z-index:1000;opacity:0;visibility:hidden;transition:opacity 0.3s ease-in-out, transform 0.3s ease-in-out;}
-    .floating-alert.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
-    .audiencias-container{margin-bottom:10px;}
-    .audiencia-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-    .audiencia-item input{flex:1;}
-    .btn-eliminar-audiencia{background:var(--danger);color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;}
-    .btn-audiencia{background:var(--success);color:white;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;margin-top:8px;}
-    #paginacion-container{display:flex;justify-content:space-between;align-items:center;padding:10px;margin-top:15px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);}
-    #paginacion-container .page-info{font-size:0.9rem;color:var(--muted);font-weight:500;}
-    #paginacion-container .nav-buttons{display:flex;gap:8px;}
+
+    #confirmModal .content {
+      max-width: 400px;
+      padding: 24px;
+      text-align: center;
+      gap: 16px;
+    }
+    #confirmModal h3 {
+      margin: 0;
+      color: var(--danger);
+      font-size: 1.5rem;
+    }
+    #confirmModal p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    #confirmModal .actions-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    #confirmModal .actions-row .btn {
+      flex-grow: 1;
+    }
+
+    .floating-alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--danger);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .floating-alert.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .audiencias-container {
+      margin-bottom: 10px;
+    }
+    .audiencia-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .audiencia-item input {
+      flex: 1;
+    }
+    .btn-eliminar-audiencia {
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .btn-audiencia {
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* Estilos para Paginación */
+    #paginacion-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-top: 15px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    #paginacion-container .page-info {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    #paginacion-container .nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -92,7 +195,7 @@
     <div class="main">
       <div class="top-actions">
         <div class="filters">
-          <input type="text" id="buscador" placeholder="🔍 Buscar por N°..." />
+          <input type="text" id="buscador" placeholder="🔍 Buscar..." />
           <select id="filtroEstado" class="simple">
             <option value="">Estado (todos)</option>
             <option>En trámite</option><option>Finalizado</option><option>En Alzada</option><option>Archivado</option>
@@ -107,7 +210,6 @@
             <option value="media">Media</option>
             <option value="alta">Alta</option>
           </select>
-          <button id="btnLimpiarFiltros" class="btn btn-ghost"><i class="fa fa-eraser"></i> Limpiar</button>
         </div>
         <div class="actions">
           <button id="btnNuevo" class="btn btn-nuevo"><i class="fa fa-plus"></i>Nuevo Expediente</button>
@@ -127,6 +229,7 @@
       </div>
       
       <div id="paginacion-container"></div>
+
     </div>
 
     <aside class="sidebar">
@@ -141,7 +244,10 @@
 
   <div id="modal">
     <div class="content">
-      <div class="modal-header"><i class="fa-solid fa-file-pen"></i><h2 id="tituloForm" style="margin:0;">Nuevo Expediente</h2></div>
+      <div class="modal-header">
+        <i class="fa-solid fa-file-pen"></i>
+        <h2 id="tituloForm" style="margin:0;">Nuevo Expediente</h2>
+      </div>
       <div class="modal-body">
         <form id="formCausa" action="#" method="post" aria-label="Formulario para nuevo expediente o edición">
           <input type="hidden" id="editId" />
@@ -152,15 +258,37 @@
             <div class="field"><label for="juzgado">Juzgado *</label><select id="juzgado" required></select></div>
             <div class="field"><label for="fechaInicio">Fecha de Inicio</label><input type="date" id="fechaInicio" /></div>
             <div class="field"><label for="fechaPase">Fecha de Pase</label><input type="datetime-local" id="fechaPase" /></div>
-            <div class="field"><label for="intervencion">Intervención</label><select id="intervencion"><option>Ministerio Complementario</option><option>Ministerio Principal</option><option>Patrocinante Actor</option><option>Patrocinante Demandado</option><option>Patrocinante Tercero</option><option value="Defensor de Ausente">Defensor de Ausente</option><option>Patrocinante presunto incapaz</option><option value="Defensor Oficial Asesor Letrado">Asesor Letrado</option><option>Ministerio Público del incapaz</option><option>Ministerio Público en turno Abril</option><option>Ministerio Público en turno Agosto</option><option>Ministerio Público en turno Diciembre</option></select></div>
+            <div class="field"><label for="intervencion">Intervención</label>
+              <select id="intervencion">
+                <option>Ministerio Complementario</option><option>Ministerio Principal</option><option>Patrocinante Actor</option>
+                <option>Patrocinante Demandado</option><option>Patrocinante Tercero</option><option value="Defensor de Ausente">Defensor de Ausente</option><option>Patrocinante presunto incapaz</option></option>
+                <option value="Defensor Oficial Asesor Letrado">Asesor Letrado</option><option>Ministerio Público del incapaz</option><option>Ministerio Público en turno Abril</option><option>Ministerio Público en turno Agosto</option><option>Ministerio Público en turno Diciembre</option>    
+              </select>
+            </div>
             <div class="field"><label for="datosNnya">Datos de NNyA (máx. 500 palabras)</label><textarea id="datosNnya" disabled></textarea><div class="counter" id="counterNnya" style="display:none">0/500</div></div>
-            <div class="field" style="grid-column:1/-1"><label for="audiencias">Audiencias señaladas</label><div id="audiencias-container" class="audiencias-container"></div><button type="button" id="btnAgregarAudiencia" class="btn-audiencia"><i class="fa fa-plus"></i> Agregar Audiencia</button></div>
+            <div class="field" style="grid-column:1/-1">
+              <label for="audiencias">Audiencias señaladas</label>
+              <div id="audiencias-container" class="audiencias-container">
+                </div>
+              <button type="button" id="btnAgregarAudiencia" class="btn-audiencia"><i class="fa fa-plus"></i> Agregar Audiencia</button>
+            </div>
             <div class="field"><label for="vencimiento">Vencimiento</label><input type="datetime-local" id="vencimiento" /></div>
             <div class="field"><label for="usuarioAsignado">Usuario Asignado</label><select id="usuarioAsignado"></select></div>
             <div class="field"><label for="estado">Estado del Proceso</label><select id="estado"><option>En trámite</option><option>Finalizado</option><option>Archivado</option><option>En Alzada</option></select></div>
-            <div class="field"><label for="prioridad">Prioridad</label><select id="prioridad" class="simple"><option value="ninguna">Ninguna (gris)</option><option value="baja">Baja (verde)</option><option value="media">Media (naranja)</option><option value="alta">Alta (roja)</option></select></div>
-            <div class="field"><label for="recursos">Recursos Interpuestos</label><select id="recursos"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select></div>
-            <div class="field"><label for="recursosContestacion">Recursos Contestación</label><select id="recursosContestacion"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select></div>
+            <div class="field"><label for="prioridad">Prioridad</label>
+              <select id="prioridad" class="simple">
+                <option value="Ninguna"><strong>Ninguna</strong> (gris)</option>
+                <option value="Baja"><strong>Baja</strong> (verde)</option>
+                <option value="Media"><strong>Media</strong> (naranja)</option>
+                <option value="Alta"><strong>Alta</strong> (roja)</option>
+              </select>
+            </div>
+            <div class="field"><label for="recursos">Recursos Interpuestos</label>
+              <select id="recursos"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select>
+            </div>
+            <div class="field"><label for="recursosContestacion">Recursos Contestación</label>
+              <select id="recursosContestacion"><option value="">Seleccione un recurso</option><option>Apelación</option><option>Queja</option><option>Inconstitucionalidad</option><option>Nulidad</option><option>Reposición</option><option>Aclaratoria</option><option>Recurso Extraordinario</option><option>Recurso de Inaplicabilidad</option></select>
+            </div>
             <div class="field"><label for="estadoRecursos">Estado de Recursos</label><select id="estadoRecursos"><option value="">Seleccione un estado</option><option>Pendiente</option><option>En trámite</option><option>Resuelto</option><option>Rechazado</option></select></div>
             <div class="field"><label for="vencimientoRecursos">Vencimiento de Recursos</label><input type="datetime-local" id="vencimientoRecursos" /></div>
             <div class="field"><label for="audienciaGesell">Audiencia en Cámara Gesell</label><div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="habilitarAudienciaGesell" /><span>Habilitar</span></div><input type="datetime-local" id="audienciaGesell" disabled /></div>
@@ -170,32 +298,53 @@
         </form>
       </div>
       <div class="controls-form">
-        <button class="btn" type="button" id="btnGuardar"><i class="fa fa-save"></i>Guardar</button>
+        <button class="btn-add" type="button" id="btnGuardar"><i class="fa fa-save"></i>Guardar</button>
         <button class="btn-delete" type="button" id="btnEliminar"><i class="fa fa-trash"></i>Eliminar</button>
         <button class="btn-print" type="button" id="btnPrintForm"><i class="fa fa-print"></i>Imprimir</button>
-        <button class="btn-ghost" type="button" id="btnCancelar"><i class="fa fa-times"></i>Cancelar</button>
+        <button class="btn-cancel" type="button" id="btnCancelar"><i class="fa fa-times"></i>Cancelar</button>
       </div>
     </div>
   </div>
+
   <div id="modalVer">
     <div class="content">
-      <div class="modal-header"><i class="fa-solid fa-eye"></i><h2 style="margin:0;">Detalle del Expediente</h2></div>
-      <div class="modal-body"><div id="verContenido"></div><div id="agregarNota"><label for="notaBitacora">Agregar Nota de Seguimiento:</label><textarea id="notaBitacora" placeholder="Escribe aquí la nota..."></textarea><button id="btnAgregarNota"><i class="fa fa-plus"></i> Guardar Nota</button></div></div>
-      <div class="controls-form" style="justify-content:flex-end;"><a href="https://defensoria6.github.io/linea-tiempo/" id="btnVerLineaTiempo" class="btn btn-view"><i class="fa-solid fa-timeline"></i> Ver Línea de Tiempo</a><button id="btnCerrarVer" class="btn btn-ghost"><i class="fa fa-xmark"></i>Cerrar</button><button id="btnPrintRegistro" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Registro</button></div>
+      <div class="modal-header">
+        <i class="fa-solid fa-eye"></i>
+        <h2 style="margin:0;">Detalle del Expediente</h2>
+      </div>
+      <div class="modal-body">
+        <div id="verContenido"></div>
+        
+        <div id="agregarNota">
+          <label for="notaBitacora">Agregar Nota de Seguimiento:</label>
+          <textarea id="notaBitacora" placeholder="Escribe aquí la nota..."></textarea>
+          <button id="btnAgregarNota"><i class="fa fa-plus"></i> Guardar Nota</button>
+        </div>
+      </div>
+      <div class="controls-form" style="justify-content:flex-end;">
+        <a href="https://defensoria6.github.io/linea-tiempo/" id="btnVerLineaTiempo" class="btn btn-view"><i class="fa-solid fa-timeline"></i> Ver Línea de Tiempo</a>
+        <button id="btnCerrarVer" class="btn btn-ghost"><i class="fa fa-xmark"></i>Cerrar</button>
+        <button id="btnPrintRegistro" class="btn btn-print"><i class="fa fa-print"></i>Imprimir Registro</button>
+      </div>
     </div>
   </div>
+
   <div id="confirmModal">
     <div class="content">
-      <h3>¿Estás seguro?</h3><p>Esta acción eliminará el registro de forma permanente. No se puede deshacer.</p>
-      <div class="actions-row"><button id="btnConfirmarEliminar" class="btn btn-delete"><i class="fa fa-trash"></i> Eliminar</button><button id="btnCancelarEliminar" class="btn btn-ghost"><i class="fa fa-xmark"></i> Cancelar</button></div>
+      <h3>¿Estás seguro?</h3>
+      <p>Esta acción eliminará el registro de forma permanente. No se puede deshacer.</p>
+      <div class="actions-row">
+        <button id="btnConfirmarEliminar" class="btn btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
+        <button id="btnCancelarEliminar" class="btn btn-ghost"><i class="fa fa-xmark"></i> Cancelar</button>
+      </div>
     </div>
   </div>
-  
-  <script type="module">
-  // ===== SDK MODULAR DE FIREBASE (v9+) =====
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, where, orderBy, limit, limitToLast, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, serverTimestamp, startAfter, endBefore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+  // ===== Firebase (COMPAT) =====
   const firebaseConfig = {
     apiKey: "AIzaSyBt6X0u0BpiNPcV2SNPrN-spCmjl2AhZaA",
     authDomain: "causas-defensoria.firebaseapp.com",
@@ -204,219 +353,273 @@
     messagingSenderId: "186064671470",
     appId: "1:186064671470:web:b58bae5eadbe6e469f19ff"
   };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const causasCollection = collection(db, "causas");
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
   // ===== Helpers UI =====
-  const $ = (id) => document.getElementById(id);
-  const tbody = $("tbodyCausas"), modal = $("modal"), modalVer = $("modalVer"), confirmModal = $("confirmModal");
-  const verContenido = $("verContenido"), tituloForm = $("tituloForm"), editId = $("editId");
-  const buscador = $("buscador"), filtroEstado = $("filtroEstado"), filtroUsuario = $("filtroUsuario"), filtroPrioridad = $("filtroPrioridad");
-  const listAud = $("listAud"), listGes = $("listGesell"), listVenc = $("listVenc"), listVrec = $("listVrec");
-  const cAud = $("countAud"), cGes = $("countGesell"), cVenc = $("countVenc"), cVrec = $("countVrec");
+  const $ = (id)=>document.getElementById(id);
+  const tbody = $("tbodyCausas");
+  const modal = $("modal");
+  const modalVer = $("modalVer");
+  const verContenido = $("verContenido");
+  const tituloForm = $("tituloForm");
+  const editId = $("editId");
+  const buscador = $("buscador");
+  const filtroEstado = $("filtroEstado");
+  const filtroUsuario = $("filtroUsuario");
+  const filtroPrioridad = $("filtroPrioridad");
+  
+  const notaBitacora = $("notaBitacora");
+  const btnAgregarNota = $("btnAgregarNota");
+  const btnVerLineaTiempo = $("btnVerLineaTiempo");
 
-  // ===== Estado de la Aplicación =====
-  let modo = "nuevo";
-  let unsubCausas = null;
-  let causaActualId = null;
-  
-  // ===== PAGINACIÓN Y FILTROS (Servidor) =====
+  const listAud = $("listAud");
+  const listGes = $("listGesell");
+  const listVenc = $("listVenc");
+  const listVrec = $("listVrec");
+  const cAud = $("countAud");
+  const cGes = $("countGesell");
+  const cVenc = $("countVenc");
+  const cVrec = $("countVrec");
+
+  const numCausaInput = $("numCausa");
+  const floatingAlert = $("floating-alert");
+  const audienciasContainer = $("audiencias-container");
+  const btnAgregarAudiencia = $("btnAgregarAudiencia");
+
+  // ===== PAGINACIÓN del lado del Servidor y Realtime =====
   const recordsPerPage = 10;
-  let firstVisible = null, lastVisible = null, queryDirection = 'next', history = [];
+  let firstVisible = null;
+  let lastVisible = null;
+  let queryDirection = 'next';
+  let history = []; // Historial para la navegación 'atrás'
   
-  // ===== Utils =====
-  const toDate = (v) => v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds * 1000) : (v ? new Date(v) : null));
+  // ===== Utils (SECCIÓN CORREGIDA) =====
+  const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
   
   function formatearFecha(d, conHora = false) {
     const fecha = toDate(d);
     if (!fecha || isNaN(fecha)) return "";
+
     const dia = String(fecha.getDate()).padStart(2, '0');
     const mes = String(fecha.getMonth() + 1).padStart(2, '0');
     const año = fecha.getFullYear();
-    if (!conHora) return `${dia}/${mes}/${año}`;
+    
+    if (!conHora) {
+      return `${dia}/${mes}/${año}`;
+    }
+    
     const horas = String(fecha.getHours()).padStart(2, '0');
     const minutos = String(fecha.getMinutes()).padStart(2, '0');
+    
     return `${dia}/${mes}/${año} ${horas}:${minutos}`;
   }
 
-  const prioridadClase = (p) => {
-    p = (p || "ninguna").toLowerCase();
-    if (p === "alta") return "prioridad-alta";
-    if (p === "media") return "prioridad-media";
-    if (p === "baja") return "prioridad-baja";
-    return "prioridad-ninguna";
-  };
-  
-  function debounce(func, delay) {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), delay);
-    };
+  function dateStrings(val){
+    const date = toDate(val);
+    if(!date || isNaN(date)) return [];
+    const y = String(date.getFullYear());
+    const m = String(date.getMonth()+1).padStart(2,'0');
+    const d = String(date.getDate()).padStart(2,'0');
+    const hh = String(date.getHours()).padStart(2,'0');
+    const mm = String(date.getMinutes()).padStart(2,'0');
+    return [
+      `${d}/${m}/${y}`, `${y}-${m}-${d}`, `${d}-${m}-${y}`, date.toLocaleDateString(),
+      `${d}/${m}/${y} ${hh}:${mm}`, `${y}-${m}-${d} ${hh}:${mm}`,
+      date.toLocaleString([], {hour:'2-digit', minute:'2-digit'})
+    ].map(s=>String(s).toLowerCase());
   }
 
-  // ===== Lógica de carga de datos (Server-side filtering) =====
-  function cargarCausas(conPaginacion = true) {
-    if (unsubCausas) unsubCausas(); // Cancela la suscripción anterior
+  const prioridadClase = (p)=>{
+    p = (p || "Ninguna").toLowerCase();
+    if(p === "alta") return "prioridad-alta";
+    if(p === "media") return "prioridad-media";
+    if(p === "baja") return "prioridad-baja";
+    return "prioridad-ninguna";
+  };
 
-    tbody.innerHTML = `<tr><td colspan="9">Cargando...</td></tr>`;
 
-    let q = query(causasCollection);
+  let datosCache = [];
+  let causaActualId = null;
+  let unsubCausas = null;
 
-    // Aplicar filtros
-    const est = filtroEstado.value;
-    const usu = filtroUsuario.value;
-    const prio = filtroPrioridad.value;
-    const busq = buscador.value.trim();
-    
-    // Firestore requiere índices para consultas compuestas. La consola de Firebase te dará un enlace para crearlos.
-    if (est) q = query(q, where("estado", "==", est));
-    if (usu) q = query(q, where("usuarioAsignado", "==", usu));
-    if (prio) q = query(q, where("prioridad", "==", prio));
-    if (busq) {
-      // Búsqueda de prefijo simple en N° de Expediente
-      q = query(q, where("numCausa", ">=", busq), where("numCausa", "<=", busq + '\uf8ff'));
+  // ===== Lógica de paginación y carga de datos desde el servidor =====
+  function suscribirCausas() {
+    if (unsubCausas) unsubCausas();
+
+    let query = db.collection("causas").orderBy("fechaRegistro", "desc").limit(recordsPerPage);
+
+    if (queryDirection === 'next' && lastVisible) {
+      query = query.startAfter(lastVisible);
+    } else if (queryDirection === 'prev' && firstVisible) {
+      query = query.endBefore(firstVisible).limitToLast(recordsPerPage);
     }
-    
-    // Aplicar orden y paginación
-    q = query(q, orderBy("fechaRegistro", "desc"));
-    
-    if (conPaginacion) {
-        if (queryDirection === 'next' && lastVisible) {
-            q = query(q, startAfter(lastVisible));
-        } else if (queryDirection === 'prev' && firstVisible) {
-            q = query(q, endBefore(firstVisible), limitToLast(recordsPerPage));
-        }
-    }
-    
-    q = query(q, limit(recordsPerPage));
-    
-    unsubCausas = onSnapshot(q, snap => {
+
+    unsubCausas = query.onSnapshot(
+      snap => {
         if (snap.empty) {
-          tbody.innerHTML = "<tr><td colspan='9'>No hay registros que coincidan con los filtros.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='9'>No hay más registros</td></tr>";
           renderPaginacion(0);
           return;
         }
 
-        const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const data = [];
+        snap.forEach(d => data.push({
+          id: d.id,
+          ...d.data()
+        }));
 
+        // Actualizar los marcadores para la siguiente página
         firstVisible = snap.docs[0];
         lastVisible = snap.docs[snap.docs.length - 1];
 
-        if (queryDirection === 'next') history.push(firstVisible);
-        else if (queryDirection === 'prev' && history.length > 1) history.pop();
+        if (queryDirection === 'next') {
+          history.push(firstVisible);
+        } else if (queryDirection === 'prev' && history.length > 1) {
+          history.pop();
+        }
 
-        renderTabla(data);
+        renderTablas(data);
         renderPaginacion(data.length);
 
+        // Actualizar el sidebar y filtros después de la primera carga
         if (history.length <= 1) {
-            actualizarSidebarYFiltros();
+          db.collection("causas").orderBy("fechaRegistro", "desc").get().then(fullSnap => {
+            const arr = [];
+            fullSnap.forEach(d => arr.push({
+              id: d.id,
+              ...d.data()
+            }));
+            datosCache = arr; // Mantener un cache completo para los filtros del cliente
+            renderSidebar(arr);
+            poblarFiltroUsuarios(arr);
+          });
         }
-    }, err => {
-        console.error("Error al cargar causas:", err);
-        tbody.innerHTML = `<tr><td colspan='9'>Error al aplicar filtros. Es posible que necesites crear un índice en Firestore.</td></tr>`;
+      },
+      err => {
+        console.error("onSnapshot causas:", err);
+        tbody.innerHTML = "<tr><td colspan='9'>Error al cargar los datos.</td></tr>";
+      }
+    );
+  }
+
+  // ===== Filtros =====
+  function filtrarDatos() {
+    const q = (buscador.value || "").toLowerCase();
+    const est = (filtroEstado.value || "").toLowerCase();
+    const usu = (filtroUsuario.value || "").toLowerCase();
+    const prio = (filtroPrioridad.value || "").toLowerCase();
+    return datosCache.filter(d => {
+      const textoCampos = [d.numCausa, d.caratula, d.tipoProceso, d.juzgado, d.intervencion, d.datosNnya, d.usuarioAsignado, d.estado, d.recursos, d.recursosContestacion, d.estadoRecursos, d.nnyaGesell, d.observaciones, d.prioridad].map(x => (x || "").toString().toLowerCase()).join(" ");
+      const fechasCampos = [d.fechaInicio, d.fechaPase, d.vencimiento, d.vencimientoRecursos, d.audienciaGesell, d.fechaRegistro];
+      const audienciasFechas = Array.isArray(d.audiencias) ? d.audiencias : [];
+      fechasCampos.push(...audienciasFechas);
+      const fechasTexto = fechasCampos.flatMap(dateStrings).join(" ");
+      const textoTotal = `${textoCampos} ${fechasTexto}`;
+      const okTexto = !q || textoTotal.includes(q);
+      const okEstado = !est || (d.estado || "").toLowerCase() === est;
+      const okUsuario = !usu || (d.usuarioAsignado || "").toLowerCase() === usu;
+      const okPrioridad = !prio || (d.prioridad || "").toLowerCase() === prio;
+      return okTexto && okEstado && okUsuario && okPrioridad;
     });
   }
 
-  // ===== Renderizado =====
-  function accionesHTML(id) {
+  const handleFilterChange = () => {
+    const filteredData = filtrarDatos();
+    renderTablas(filteredData);
+    // Ocultar la paginación del servidor cuando se usan los filtros
+    $("paginacion-container").style.display = filteredData.length > recordsPerPage ? "flex" : "none";
+  };
+  
+  buscador.oninput = handleFilterChange;
+  filtroEstado.onchange = handleFilterChange;
+  filtroUsuario.onchange = handleFilterChange;
+  filtroPrioridad.onchange = handleFilterChange;
+
+  // ===== Render =====
+  function accionesHTML(id){
     return `<button class="btn-view" data-id="${id}" title="Ver"><i class="fa fa-eye"></i></button>
             <button class="btn-edit" data-id="${id}" title="Editar"><i class="fa fa-pen"></i></button>
             <button class="btn-delete" data-id="${id}" title="Eliminar"><i class="fa fa-trash"></i></button>
             <a href="https://defensoria6.github.io/linea-tiempo/?id=${id}" class="btn-view" title="Ver Línea de Tiempo"><i class="fa-solid fa-timeline"></i></a>`;
   }
 
-  function renderTabla(data) {
-    let html = data.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
-    data.forEach(d => {
-      html += `
+  function renderTablas(data){
+    tbody.innerHTML = data.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
+    data.forEach(d=>{
+      tbody.insertAdjacentHTML("beforeend", `
         <tr>
-          <td class="mono">${d.numCausa || ""}</td>
-          <td>${d.caratula || ""}</td>
-          <td>${d.tipoProceso || ""}</td>
-          <td>${d.juzgado || ""}</td>
-          <td>${d.usuarioAsignado || ""}</td>
-          <td>${d.estado || ""}</td>
-          <td><span class="prioridad-pill ${prioridadClase(d.prioridad)}">${d.prioridad || "Ninguna"}</span></td>
+          <td class="mono">${d.numCausa||""}</td>
+          <td>${d.caratula||""}</td>
+          <td>${d.tipoProceso||""}</td>
+          <td>${d.juzgado||""}</td>
+          <td>${d.usuarioAsignado||""}</td>
+          <td>${d.estado||""}</td>
+          <td><span class="prioridad-pill ${prioridadClase(d.prioridad)}">${d.prioridad||"Ninguna"}</span></td>
           <td class="nowrap">${formatearFecha(d.fechaRegistro, false)}</td>
-          <td class="nowrap actions">${accionesHTML(d.id)}</td>
-        </tr>`;
+          <td class="nowrap">${accionesHTML(d.id)}</td>
+        </tr>`);
     });
-    tbody.innerHTML = html;
+
+    document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
+    document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
+    document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>abrirConfirmarEliminar(b.dataset.id));
+    
+    // Si la tabla se renderiza por un filtro, no se muestra paginación del servidor
+    if ($("paginacion-container").style.display === "none") {
+        renderPaginacion(data.length);
+    }
   }
 
+  // ===== PAGINACIÓN: Render y Controles =====
   function renderPaginacion(recordsOnPage) {
     const container = $("paginacion-container");
     container.style.display = "flex";
     container.innerHTML = `
-      <div class="page-info">Mostrando ${recordsOnPage} registros</div>
+      <div class="page-info">
+        Mostrando ${recordsOnPage} registros
+      </div>
       <div class="nav-buttons">
         <button id="btnPrevPage" class="btn btn-ghost" ${history.length <= 1 ? 'disabled' : ''}><i class="fa fa-arrow-left"></i> Anterior</button>
         <button id="btnNextPage" class="btn btn-ghost" ${recordsOnPage < recordsPerPage ? 'disabled' : ''}>Siguiente <i class="fa fa-arrow-right"></i></button>
-      </div>`;
+      </div>
+    `;
 
-    $("btnPrevPage").onclick = () => { queryDirection = 'prev'; cargarCausas(); };
-    $("btnNextPage").onclick = () => { queryDirection = 'next'; cargarCausas(); };
+    $("btnPrevPage").onclick = () => {
+      queryDirection = 'prev';
+      suscribirCausas();
+    };
+
+    $("btnNextPage").onclick = () => {
+      queryDirection = 'next';
+      suscribirCausas();
+    };
   }
 
-  // ===== Manejo de Filtros y Eventos =====
-  const handleFilterChange = () => {
-    firstVisible = null;
-    lastVisible = null;
-    history = [];
-    queryDirection = 'next';
-    cargarCausas();
-  };
-
-  buscador.addEventListener('input', debounce(handleFilterChange, 400));
-  filtroEstado.onchange = handleFilterChange;
-  filtroUsuario.onchange = handleFilterChange;
-  filtroPrioridad.onchange = handleFilterChange;
-  
-  $("btnLimpiarFiltros").onclick = () => {
-    buscador.value = "";
-    filtroEstado.value = "";
-    filtroUsuario.value = "";
-    filtroPrioridad.value = "";
-    handleFilterChange();
-  };
-
-  // Delegación de eventos para la tabla
-  tbody.addEventListener('click', (e) => {
-    const targetButton = e.target.closest('button, a');
-    if (!targetButton?.dataset?.id) return;
-    const { id } = targetButton.dataset;
-
-    if (targetButton.classList.contains('btn-view') && targetButton.tagName !== 'A') abrirVer(id);
-    else if (targetButton.classList.contains('btn-edit')) abrirEditar(id);
-    else if (targetButton.classList.contains('btn-delete')) abrirConfirmarEliminar(id);
-  });
-
-  // ===== Sidebar y Filtros (se actualizan con todos los datos) =====
-  async function actualizarSidebarYFiltros() {
-      const allDocsQuery = query(causasCollection, orderBy("fechaRegistro", "desc"));
-      const snap = await getDocs(allDocsQuery);
-      const allData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderSidebar(allData);
-      poblarFiltroUsuarios(allData);
-  }
-
+  // ===== Sidebar (eventos próximos) =====
   function renderSidebar(data){
-    const hoy = new Date(), limite = new Date(hoy.getTime() + 30*24*60*60*1000);
+    const hoy = new Date();
+    const limite = new Date(hoy.getTime() + 30*24*60*60*1000);
     const eventos = {aud:[], ges:[], venc:[], vrec:[]};
-    const pushIfRange = (arr, fecha, label) => { const f = toDate(fecha); if(f && f >= hoy && f <= limite) arr.push({f, label}); };
-    data.forEach(d => {
-        const id = d.numCausa || d.id;
-        if (Array.isArray(d.audiencias)) d.audiencias.forEach(aud => pushIfRange(eventos.aud, aud, id));
-        pushIfRange(eventos.ges, d.audienciaGesell, id);
-        pushIfRange(eventos.venc, d.vencimiento, id);
-        pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} — ${d.recursos||'Recurso'}`);
+    const pushIfRange = (arr, fecha, label)=>{ const f = toDate(fecha); if(!f || isNaN(f)) return; if(f>=hoy && f<=limite) arr.push({f,label}); };
+    data.forEach(d=>{
+      const id = d.numCausa || d.id;
+      
+      if (Array.isArray(d.audiencias)) {
+        d.audiencias.forEach(aud => pushIfRange(eventos.aud, aud, `${id}`));
+      } else if (d.audiencias) {
+        pushIfRange(eventos.aud, d.audiencias, `${id}`);
+      }
+      
+      pushIfRange(eventos.ges, d.audienciaGesell, `${id}`);
+      pushIfRange(eventos.venc, d.vencimiento, `${id}`);
+      pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} — ${d.recursos||'Recurso'}`);
     });
-    const renderList = (arr, target, counterRef, empty) => {
-      arr.sort((a,b) => a.f - b.f);
-      counterRef.textContent = arr.length;
-      target.innerHTML = arr.length ? arr.map(e => `<div class="event"><div class="when">${formatearFecha(e.f, true)}</div><div class="what">— ${e.label}</div></div>`).join('') : `<div class="k">${empty}</div>`;
+    const renderList = (arr, target, counterRef, empty)=>{
+      arr.sort((a,b)=>a.f-b.f); target.innerHTML="";
+      if(!arr.length){ target.innerHTML = `<div class="k">${empty}</div>`; counterRef.textContent = "0"; return; }
+      counterRef.textContent = String(arr.length);
+      arr.forEach(e=> target.insertAdjacentHTML("beforeend", `<div class="event"><div class="when">${formatearFecha(e.f, true)}</div><div class="what">— ${e.label}</div></div>`));
     };
     renderList(eventos.aud, listAud, cAud, "No hay audiencias próximas");
     renderList(eventos.ges, listGes, cGes, "No hay Cámaras Gesell próximas");
@@ -424,188 +627,303 @@
     renderList(eventos.vrec, listVrec, cVrec, "No hay venc. de recursos próximos");
   }
 
+  // ===== Filtro usuarios =====
   function poblarFiltroUsuarios(data){
-    const set = new Set(data.map(d => d.usuarioAsignado).filter(Boolean));
-    const current = filtroUsuario.value;
-    filtroUsuario.innerHTML = `<option value="">Usuario (todos)</option>` + [...set].sort().map(u => `<option value="${u}">${u}</option>`).join('');
-    filtroUsuario.value = current;
+    const set = new Set([""]); data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
+    const current = filtroUsuario.value; filtroUsuario.innerHTML = "";
+    [...set].forEach(u=>{ const opt = document.createElement("option"); opt.value=u; opt.textContent = u ? u : "Usuario (todos)"; filtroUsuario.appendChild(opt); });
+    filtroUsuario.value = current || "";
   }
 
-  // ===== ABM Causas (con SDK v9+) =====
-  $("btnNuevo").onclick = () => { 
+  // ===== ABM Causas =====
+  $("btnNuevo").onclick = ()=>{ 
     modo = "nuevo"; 
     resetFormCausa(); 
     editId.value = ""; 
     tituloForm.textContent = "Nuevo Expediente"; 
     modal.style.display = "flex"; 
   };
-
-  $("btnGuardar").onclick = async () => {
+  $("btnGuardar").onclick = async ()=>{
     const datos = recolectarDatosForm();
     if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) { 
-      return alert("Completa los campos obligatorios (N° Expediente, Carátula, Tipo y Juzgado).");
+      alert("Completa los campos obligatorios (N° Expediente, Carátula, Tipo y Juzgado)."); 
+      return; 
     }
-    
-    const btn = $("btnGuardar");
-    const originalHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> Guardando...`;
-
-    try {
-      if (modo === "nuevo") {
-        const q = query(causasCollection, where("numCausa", "==", datos.numCausa));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          mostrarAlertaFlotante("Esta causa ya se encuentra registrada. Verifique el número.");
+    const btnGuardar = $("btnGuardar");
+    btnGuardar.disabled = true;
+    try{
+      if (modo==="nuevo"){
+        const numCausaExistente = datosCache.some(d => d.numCausa === datos.numCausa);
+        if (numCausaExistente) {
+          mostrarAlertaFlotante("Esta causa ya se encuentra registrada en el listado. Vuelva a escribir nuevamente.");
+          btnGuardar.disabled = false;
           return;
         }
-        await addDoc(causasCollection, { ...datos, fechaRegistro: serverTimestamp() });
-      } else {
-        await updateDoc(doc(db, "causas", editId.value), datos);
+        await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
+      }else{
+        await db.collection("causas").doc(editId.value).update(datos);
       }
       modal.style.display = "none";
-    } catch(e) { 
+    }catch(e){ 
       console.error(e); 
-      alert("No se pudo guardar. Revisa la consola.");
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = originalHTML;
+      alert("No se pudo guardar. Revisa la consola."); 
+      btnGuardar.disabled = false;
     }
   };
-
-  async function abrirEditar(id) {
-    modo = "editar";
-    resetFormCausa();
-    editId.value = id;
-    tituloForm.textContent = "Editar Expediente";
-    try {
-      const d = await getDoc(doc(db, "causas", id));
-      if (d.exists()) {
-        cargarDatosEnForm(d.data());
-        modal.style.display = "flex";
+  numCausaInput.addEventListener("blur", () => {
+    if (modo === "nuevo") {
+      const numCausa = numCausaInput.value.trim();
+      if (numCausa) {
+        const numCausaExistente = datosCache.some(d => d.numCausa === numCausa);
+        if (numCausaExistente) {
+          mostrarAlertaFlotante("Esta causa ya se encuentra registrada en el listado. Vuelva a escribir nuevamente.");
+        }
       }
-    } catch(e) {
-      console.error(e);
-      alert("No se pudo abrir el registro");
     }
+  });
+  function mostrarAlertaFlotante(mensaje) {
+    floatingAlert.textContent = mensaje;
+    floatingAlert.classList.add("show");
+    setTimeout(() => {
+      floatingAlert.classList.remove("show");
+    }, 5000);
   }
-
+  $("btnEliminar").onclick = ()=>{
+    const id = editId.value;
+    if (id) {
+      modal.style.display = "none";
+      abrirConfirmarEliminar(id);
+    } else {
+      alert("No hay un expediente seleccionado para eliminar.");
+    }
+  };
+  $("btnCancelar").onclick = ()=>{ if (confirm("¿Cancelar? Se perderán los cambios no guardados.")) modal.style.display = "none"; };
+  async function abrirEditar(id){
+    modo = "editar"; resetFormCausa(); editId.value = id; tituloForm.textContent = "Editar Expediente";
+    try{
+      const snap = await db.collection("causas").doc(id).get();
+      if (snap.exists){ cargarDatosEnForm(snap.data()); modal.style.display = "flex"; }
+    }catch(e){ console.error(e); alert("No se pudo abrir el registro"); }
+  }
+  const confirmModal = $("confirmModal");
+  const btnConfirmarEliminar = $("btnConfirmarEliminar");
+  const btnCancelarEliminar = $("btnCancelarEliminar");
   function abrirConfirmarEliminar(id) {
-    $("btnConfirmarEliminar").dataset.idToDelete = id;
+    btnConfirmarEliminar.dataset.idToDelete = id;
     confirmModal.style.display = "flex";
   }
-
-  $("btnConfirmarEliminar").onclick = async (e) => {
-    const idToDelete = e.currentTarget.dataset.idToDelete;
-    if (!idToDelete) return;
+  btnConfirmarEliminar.addEventListener("click", async () => {
+    const idToDelete = btnConfirmarEliminar.dataset.idToDelete;
+    if (!idToDelete) {
+      console.error("No se encontró el ID para eliminar.");
+      return;
+    }
     try {
-      await deleteDoc(doc(db, "causas", idToDelete));
+      await db.collection("causas").doc(idToDelete).delete();
       confirmModal.style.display = "none";
+      btnConfirmarEliminar.dataset.idToDelete = "";
     } catch (e) {
-      console.error("Error al eliminar:", e);
+      console.error("Error al eliminar el expediente:", e);
       alert("No se pudo eliminar el registro.");
     }
+  });
+  btnCancelarEliminar.onclick = () => {
+    confirmModal.style.display = "none";
+    btnConfirmarEliminar.dataset.idToDelete = "";
   };
-
-  async function abrirVer(id) {
+  async function abrirVer(id){
     causaActualId = id;
-    try {
-        const snap = await getDoc(doc(db, "causas", id));
-        if (!snap.exists()) return alert("El expediente no fue encontrado.");
-        
+    try{
+        const snap = await db.collection("causas").doc(id).get();
+        if (!snap.exists) {
+            alert("El expediente no fue encontrado.");
+            return;
+        }
         const d = snap.data();
         let contenidoHTML = "";
-        const etiquetas = { numCausa: "N° Expediente", caratula: "Carátula", tipoProceso: "Tipo de Proceso", juzgado: "Juzgado", fechaInicio: "Fecha de Inicio", fechaPase: "Fecha de Pase", intervencion: "Intervención", datosNnya: "Datos de NNyA", vencimiento: "Vencimiento", usuarioAsignado: "Usuario Asignado", estado: "Estado", prioridad: "Prioridad", recursos: "Recursos Interpuestos", recursosContestacion: "Contestación de Recursos", estadoRecursos: "Estado de Recursos", vencimientoRecursos: "Vencimiento de Recursos", audienciaGesell: "Audiencia Gesell", nnyaGesell: "NNyA en Gesell", observaciones: "Observaciones", fechaRegistro: "Fecha de Registro" };
-        const ordenClaves = ["numCausa", "caratula", "tipoProceso", "juzgado", "estado", "prioridad", "usuarioAsignado", "fechaRegistro", "fechaInicio", "fechaPase", "intervencion", "datosNnya", "vencimiento", "audiencias", "recursos", "recursosContestacion", "estadoRecursos", "vencimientoRecursos", "audienciaGesell", "nnyaGesell", "observaciones"];
+
+        const etiquetas = {
+            numCausa: "N° Expediente", caratula: "Carátula", tipoProceso: "Tipo de Proceso", juzgado: "Juzgado",
+            fechaInicio: "Fecha de Inicio", fechaPase: "Fecha de Pase", intervencion: "Intervención",
+            datosNnya: "Datos de NNyA", vencimiento: "Vencimiento", usuarioAsignado: "Usuario Asignado",
+            estado: "Estado", prioridad: "Prioridad", recursos: "Recursos Interpuestos",
+            recursosContestacion: "Contestación de Recursos", estadoRecursos: "Estado de Recursos",
+            vencimientoRecursos: "Vencimiento de Recursos", audienciaGesell: "Audiencia Gesell",
+            nnyaGesell: "NNyA en Gesell", observaciones: "Observaciones", fechaRegistro: "Fecha de Registro"
+        };
+        
+        const ordenClaves = [
+            "numCausa", "caratula", "tipoProceso", "juzgado", "estado", "prioridad", "usuarioAsignado",
+            "fechaRegistro", "fechaInicio", "fechaPase", "intervencion", "datosNnya", "vencimiento",
+            "audiencias", "recursos", "recursosContestacion", "estadoRecursos", "vencimientoRecursos",
+            "audienciaGesell", "nnyaGesell", "observaciones"
+        ];
         
         ordenClaves.forEach(k => {
             const v = d[k];
             if (v !== null && v !== undefined && v !== "") {
                 const etiqueta = etiquetas[k] || k;
                 if (k === "audiencias" && Array.isArray(v) && v.length > 0) {
-                    contenidoHTML += `<p><strong>Audiencias:</strong></p>` + v.map(aud => `<p style="margin-left: 20px;">${formatearFecha(aud, true)}</p>`).join('');
+                    contenidoHTML += `<p><strong>Audiencias:</strong></p>`;
+                    v.forEach(aud => {
+                        contenidoHTML += `<p style="margin-left: 20px;">${formatearFecha(aud, true)}</p>`;
+                    });
                 } else if (['fechaInicio', 'fechaRegistro'].includes(k)) {
                     contenidoHTML += `<p><strong>${etiqueta}:</strong> ${formatearFecha(v, false)}</p>`;
                 } else if (v.seconds) {
                     contenidoHTML += `<p><strong>${etiqueta}:</strong> ${formatearFecha(v, true)}</p>`;
                 } else if (k !== "audiencias") {
-                    contenidoHTML += `<p><strong>${etiqueta}:</strong> ${String(v).replace(/\n/g, '<br>')}</p>`;
+                    contenidoHTML += `<p><strong>${etiqueta}:</strong> ${v}</p>`;
                 }
             }
         });
 
         verContenido.innerHTML = contenidoHTML;
-        $("btnVerLineaTiempo").href = `https://defensoria6.github.io/linea-tiempo/?id=${id}`;
+        btnVerLineaTiempo.href = `https://defensoria6.github.io/linea-tiempo/?id=${causaActualId}`;
         modalVer.style.display = "flex";
     } catch(e) {
         console.error(e);
         alert("No se pudo abrir el detalle");
     }
+}
+  async function agregarNota() {
+    if (!causaActualId) return alert("No se ha seleccionado una causa.");
+    const notaTexto = notaBitacora.value.trim();
+    if (!notaTexto) return alert("Por favor, escribe un texto para la nota.");
+    const usuario = "Usuario Actual"; 
+    try {
+      await db.collection("causas").doc(causaActualId).collection("seguimiento").add({
+        texto: notaTexto, fecha: firebase.firestore.FieldValue.serverTimestamp(), usuario: usuario
+      });
+      alert("Nota guardada con éxito.");
+      notaBitacora.value = "";
+    } catch (e) {
+      console.error("Error al guardar la nota:", e);
+      alert("No se pudo guardar la nota.");
+    }
   }
+  btnAgregarNota.onclick = agregarNota;
+  $("btnCerrarVer").onclick = ()=> modalVer.style.display = "none";
+  const printSection = (html)=>{ const w = window.open("","_blank","width=900,height=700"); w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`); w.document.close(); w.focus(); w.print(); };
+  $("btnPrintListado").onclick = ()=>{ const head = tbody.closest("table").querySelector("thead").outerHTML; const body = tbody.outerHTML; printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`); };
+  $("btnPrintFechas").onclick = ()=>{ const html = `<h3>Audiencias</h3>${listAud.outerHTML}<h3>Cámara Gesell</h3>${listGes.outerHTML}<h3>Vencimientos</h3>${listVenc.outerHTML}<h3>Venc. de Recursos</h3>${listVrec.outerHTML}`; printSection(html); };
+  $("btnPrintForm").onclick = ()=> printSection($("formCausa").outerHTML);
+  $("btnPrintRegistro").onclick = ()=> printSection($("verContenido").outerHTML);
 
-  // ===== Lógica del Formulario (sin cambios mayores) =====
-  // (Las funciones de recolectarDatosForm, cargarDatosEnForm, initForm, etc., se mantienen casi idénticas)
-  const juzgadosPorTipo = { Administrativo: ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"], Civil: ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 8 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"], Penal: ["Juzgado de Instrucción N° 1 - Posadas","Juzgado de Instrucción N° 2 - Posadas","Juzgado de Instrucción N° 3 - Posadas","Juzgado de Instrucción N° 6 - Posadas","Juzgado de Instrucción N° 7 - Posadas","Juzgado Correccional y de Menores N° 1 - Posadas","Juzgado Correccional y de Menores N° 2 - Posadas","Tribunal Penal N° 1 - Posadas", "Tribunal Penal N° 2 - Posadas"], Laboral: ["Juzgado Laboral N° 1 - Posadas","Juzgado Laboral N° 2 - Posadas","Juzgado Laboral N° 3 - Posadas","Juzgado Laboral N° 4 - Posadas"], Familia: ["Juzgado de Familia N° 1 - Posadas","Juzgado de Familia N° 2 - Posadas","Juzgado de Familia N° 3 - Posadas","Juzgado Familia y VF Garupa", "... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"], "Violencia Familiar": ["Juzgado de Violencia Familiar N° 1 - Posadas","Juzgado de Violencia Familiar N° 2 - Posadas","Juzgado F y Violencia Familiar Garupa","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"], Paz: ["Juzgado de Paz Civil Comercial N° 1 - Posadas","Juzgado de Paz Civil Comercial N° 2 - Posadas","Juzgado de Paz de Itaembe Mini - Posadas","Juzgado de Paz de Itaembe Guazu - Posadas","Juzgado de Paz de Villa Cabello - Posadas","Juzgado de Paz de Garupa","Juzgado de Paz de Fatima - Garupa","Juzgado de Paz de Apostoles","Juzgado de Paz Candelaria"] };
+  // ===== Form =====
+  const juzgadosPorTipo = {
+    Administrativo: ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
+    Civil: ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 8 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
+    Penal: ["Juzgado de Instrucción N° 1 - Posadas","Juzgado de Instrucción N° 2 - Posadas","Juzgado de Instrucción N° 3 - Posadas","Juzgado de Instrucción N° 6 - Posadas","Juzgado de Instrucción N° 7 - Posadas","Juzgado Correccional y de Menores N° 1 - Posadas","Juzgado Correccional y de Menores N° 2 - Posadas","Tribunal Penal N° 1 - Posadas", "Tribunal Penal N° 2 - Posadas"],
+    Laboral: ["Juzgado Laboral N° 1 - Posadas","Juzgado Laboral N° 2 - Posadas","Juzgado Laboral N° 3 - Posadas","Juzgado Laboral N° 4 - Posadas"],
+    Familia: ["Juzgado de Familia N° 1 - Posadas","Juzgado de Familia N° 2 - Posadas","Juzgado de Familia N° 3 - Posadas","Juzgado Familia y VF Garupa", "... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
+    "Violencia Familiar": ["Juzgado de Violencia Familiar N° 1 - Posadas","Juzgado de Violencia Familiar N° 2 - Posadas","Juzgado F y Violencia Familiar Garupa","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
+    Paz: ["Juzgado de Paz Civil Comercial N° 1 - Posadas","Juzgado de Paz Civil Comercial N° 2 - Posadas","Juzgado de Paz de Itaembe Mini - Posadas","Juzgado de Paz de Itaembe Guazu - Posadas","Juzgado de Paz de Villa Cabello - Posadas","Juzgado de Paz de Garupa","Juzgado de Paz de Fatima - Garupa","Juzgado de Paz de Apostoles","Juzgado de Paz Candelaria"]
+  };
   const usuarios = ["Bazante Nadia Romina","Cardozo Maria Raquel","Cedron Noelia Aurora","Corrales Alicia Mariela","Escobar Monica Graciela","Fioravante Romulo","Gonzalez Alberto Misael","Gonzalez Juan Jose","Gudiño Natalia Esther","Magnani Enzo Luciano","Pablos Patricia","Palacios Ana Gabriela","Ramos Marcelo Gustavo","Riveros Patricia Soledad","Sosa Rita Cecilia"];
-  const selTipo = $("tipoProceso"), selJuz = $("juzgado"), selUsu = $("usuarioAsignado");
-  function initForm() {
-    const tipos = Object.keys(juzgadosPorTipo);
-    selTipo.innerHTML = tipos.map(t => `<option value="${t}">${t}</option>`).join('');
-    selUsu.innerHTML = usuarios.map(u => `<option value="${u}">${u}</option>`).join('');
-    selTipo.value = "Administrativo";
-    actualizarJuzgados();
-    toggleGesell(false);
-    $("habilitarAudienciaGesell").checked = false;
+  const selTipo = $("tipoProceso"), selJuz = $("juzgado"), selUsu = $("usuarioAsignado"), selPrioridad = $("prioridad");
+  function initForm(){
+    const tipos = ["Administrativo","Civil","Penal","Laboral","Familia","Violencia Familiar","Paz"];
+    selTipo.innerHTML = ""; tipos.forEach(t=>{let o=document.createElement("option");o.value=t;o.textContent=t;selTipo.appendChild(o);});
+    selUsu.innerHTML = ""; usuarios.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=u;selUsu.appendChild(o);});
+    selTipo.value = "Administrativo"; actualizarJuzgados();
+    toggleGesell(false); $("habilitarAudienciaGesell").checked = false;
   }
-  function actualizarJuzgados() { const j = juzgadosPorTipo[selTipo.value] || []; selJuz.innerHTML = j.map(x => `<option value="${x}">${x}</option>`).join(''); }
-  function toggleGesell(enabled) { const ag = $("audienciaGesell"), ng = $("nnyaGesell"), counter = $("counterNnyaGesell"); ag.disabled = !enabled; ng.disabled = !enabled; counter.style.display = enabled ? 'block' : 'none'; if (!enabled) { ag.value = ""; ng.value = ""; } }
-  function resetFormCausa() { $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; $("prioridad").value = "ninguna"; $("audiencias-container").innerHTML = ""; agregarAudiencia(); }
-  function recolectarDatosForm() {
+  function actualizarJuzgados(){ const tipo = selTipo.value; const j = juzgadosPorTipo[tipo]||[]; selJuz.innerHTML=""; j.forEach(x=>{let o=document.createElement("option");o.value=x;o.textContent=x;selJuz.appendChild(o);}); }
+  selTipo.addEventListener("change", actualizarJuzgados);
+  $("intervencion").addEventListener("change", function(){
+    const datosNnya = $("datosNnya"), contadorNnya = $("counterNnya");
+    if (this.value === "Ministerio Complementario") { datosNnya.removeAttribute("disabled"); contadorNnya.style.display='block'; }
+    else { datosNnya.value = ""; datosNnya.setAttribute("disabled","true"); contadorNnya.style.display='none'; }
+  });
+  const limitWords = (text, max)=>{ const words = text.trim().split(/\s+/).filter(Boolean); return words.length > max ? words.slice(0,max).join(" ") : text; };
+  $("observaciones").addEventListener("input", function(){ this.value = limitWords(this.value, 1000); $("counter").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/1000`; });
+  $("datosNnya").addEventListener("input", function(){ this.value = limitWords(this.value, 500); $("counterNnya").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/500`; });
+  $("nnyaGesell").addEventListener("input", function(){ this.value = limitWords(this.value, 400); $("counterNnyaGesell").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/400`; });
+  $("habilitarAudienciaGesell").addEventListener("change", function(){ toggleGesell(this.checked); });
+  function toggleGesell(enabled){ const ag = $("audienciaGesell"), ng = $("nnyaGesell"); if (enabled){ ag.removeAttribute("disabled"); ng.removeAttribute("disabled"); $("counterNnyaGesell").style.display='block'; } else { ag.value = ""; ng.value = ""; ag.setAttribute("disabled","true"); ng.setAttribute("disabled","true"); $("counterNnyaGesell").style.display='none'; } }
+  function resetFormCausa(){ 
+    $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; selPrioridad.value = "Ninguna"; 
+    audienciasContainer.innerHTML = ""; agregarAudiencia();
+  }
+  function recolectarDatosForm(){
+    const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","vencimiento","usuarioAsignado","estado","prioridad","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
     const datos = {};
-    const fields = ["numCausa", "caratula", "tipoProceso", "juzgado", "intervencion", "datosNnya", "usuarioAsignado", "estado", "prioridad", "recursos", "recursosContestacion", "estadoRecursos", "nnyaGesell", "observaciones"];
-    fields.forEach(id => datos[id] = $(id).value || "");
-    const dateFields = ["fechaInicio", "fechaPase", "vencimiento", "vencimientoRecursos", "audienciaGesell"];
-    dateFields.forEach(id => datos[id] = $(id).value ? new Date($(id).value) : null);
-    datos.audiencias = [...$("audiencias-container").querySelectorAll('input[type="datetime-local"]')].map(i => i.value ? new Date(i.value) : null).filter(Boolean);
+    fields.forEach(id=>{ const el = $(id); if(!el) return; if (["date","datetime-local"].includes(el.type)) { datos[id] = el.value ? new Date(el.value) : null; } else { datos[id] = el.value || ""; } });
+    const audiencias = [];
+    audienciasContainer.querySelectorAll('input[type="datetime-local"]').forEach(input => { if (input.value) audiencias.push(new Date(input.value)); });
+    datos.audiencias = audiencias.length > 0 ? audiencias : null;
     return datos;
   }
+  
   function cargarDatosEnForm(d) {
-      const formatFechaParaInput = (fecha, conHora = true) => { if (!fecha || isNaN(fecha)) return ""; const dt = new Date(fecha.getTime() - (fecha.getTimezoneOffset() * 60000)); return dt.toISOString().slice(0, conHora ? 16 : 10); };
-      const setVal = (id, val) => { const el = $(id); if (el) el.value = val ?? ""; };
+      const formatFechaParaInput = (fecha, conHora = true) => {
+          if (!fecha || isNaN(fecha)) return "";
+          const año = fecha.getFullYear();
+          const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+          const dia = String(fecha.getDate()).padStart(2, '0');
+          if (!conHora) {
+              return `${año}-${mes}-${dia}`;
+          }
+          const horas = String(fecha.getHours()).padStart(2, '0');
+          const minutos = String(fecha.getMinutes()).padStart(2, '0');
+          return `${año}-${mes}-${dia}T${horas}:${minutos}`;
+      };
+      const setVal = (id, val) => {
+          const el = $(id);
+          if (!el) return;
+          if (val?.seconds) {
+              const fecha = toDate(val);
+              if (el.type === "date") {
+                  el.value = formatFechaParaInput(fecha, false);
+              } else if (el.type === "datetime-local") {
+                  el.value = formatFechaParaInput(fecha, true);
+              } else {
+                  el.value = val;
+              }
+          } else {
+              el.value = val ?? "";
+          }
+      };
       initForm();
-      if (d.tipoProceso) { selTipo.value = d.tipoProceso; actualizarJuzgados(); }
-      Object.keys(d).forEach(k => {
-          if (d[k]?.seconds) { setVal(k, formatFechaParaInput(toDate(d[k]), $(k)?.type === 'datetime-local')); } 
-          else { setVal(k, d[k]); }
-      });
-      const audienciasContainer = $("audiencias-container");
+      if (d.tipoProceso) {
+          selTipo.value = d.tipoProceso;
+          actualizarJuzgados();
+      }
+      ["numCausa", "caratula", "tipoProceso", "juzgado", "intervencion", "datosNnya", "usuarioAsignado", "estado", "prioridad", "recursos", "recursosContestacion", "estadoRecursos", "nnyaGesell", "observaciones"].forEach(k => setVal(k, d[k]));
+      ["fechaInicio", "fechaPase", "vencimiento", "vencimientoRecursos", "audienciaGesell"].forEach(k => setVal(k, d[k]));
       audienciasContainer.innerHTML = "";
       if (Array.isArray(d.audiencias) && d.audiencias.length > 0) {
-          d.audiencias.forEach(aud => audienciasContainer.appendChild(crearAudienciaItem(formatFechaParaInput(toDate(aud), true))));
-      } else { agregarAudiencia(); }
+          d.audiencias.forEach(aud => {
+              const fecha = toDate(aud);
+              if (fecha) {
+                  audienciasContainer.appendChild(crearAudienciaItem(formatFechaParaInput(fecha, true)));
+              }
+          });
+      } else {
+          agregarAudiencia();
+      }
       const habilitar = !!(d.audienciaGesell || d.nnyaGesell);
       $("habilitarAudienciaGesell").checked = habilitar;
       toggleGesell(habilitar);
   }
-  function crearAudienciaItem(value = "") { const item = document.createElement('div'); item.className = 'audiencia-item'; item.innerHTML = `<input type="datetime-local" value="${value}"><button type="button" class="btn-eliminar-audiencia"><i class="fa fa-trash"></i></button>`; item.querySelector('.btn-eliminar-audiencia').onclick = () => { if ($("audiencias-container").children.length > 1) item.remove(); else mostrarAlertaFlotante("Debe haber al menos una audiencia"); }; return item; }
-  function agregarAudiencia() { $("audiencias-container").appendChild(crearAudienciaItem()); }
-  $("btnAgregarAudiencia").onclick = agregarAudiencia;
-  
-  // ===== INICIALIZACIÓN Y EVENTOS GLOBALES =====
-  $("btnCancelarEliminar").onclick = () => confirmModal.style.display = "none";
-  $("btnCerrarVer").onclick = () => modalVer.style.display = "none";
-  $("btnCancelar").onclick = () => { if (confirm("¿Cancelar? Se perderán los cambios no guardados.")) modal.style.display = "none"; };
-  $("habilitarAudienciaGesell").onchange = (e) => toggleGesell(e.target.checked);
-  window.addEventListener("click", e => { if (e.target === modal || e.target === modalVer || e.target === confirmModal) e.target.style.display = "none"; });
-  const printSection = (html) => { const w = window.open(); w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`); w.document.close(); w.print(); };
-  $("btnPrintListado").onclick = () => printSection($("table").outerHTML);
-  $("btnPrintFechas").onclick = () => printSection($("sidebar").innerHTML);
-  $("btnPrintForm").onclick = () => printSection($("formCausa").outerHTML);
-  $("btnPrintRegistro").onclick = () => printSection($("verContenido").outerHTML);
-  function mostrarAlertaFlotante(mensaje) { const alert = $("floating-alert"); alert.textContent = mensaje; alert.classList.add("show"); setTimeout(() => alert.classList.remove("show"), 5000); }
+
+  function crearAudienciaItem(value = "") {
+    const item = document.createElement('div');
+    item.className = 'audiencia-item';
+    item.innerHTML = `<input type="datetime-local" value="${value}"><button type="button" class="btn-eliminar-audiencia"><i class="fa fa-trash"></i></button>`;
+    const eliminarBtn = item.querySelector('.btn-eliminar-audiencia');
+    eliminarBtn.onclick = function() { if (audienciasContainer.children.length > 1) item.remove(); else mostrarAlertaFlotante("Debe haber al menos una audiencia"); };
+    return item;
+  }
+  function agregarAudiencia() { audienciasContainer.appendChild(crearAudienciaItem()); }
+  btnAgregarAudiencia.onclick = agregarAudiencia;
+  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modal.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
+  poblarFiltroUsuarios([]);
+  let modo = "nuevo";
   
   initForm();
-  cargarCausas(); // Carga inicial de datos
+  suscribirCausas();
   </script>
 </body>
 </html>
