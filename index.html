@@ -26,6 +26,7 @@
 
     .btn{border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.92rem;transition:.2s;white-space:nowrap;line-height:1.2;display:inline-flex;align-items:center;gap:8px}
     .btn:hover{opacity:.95}
+    .btn:disabled{background:#ccc;cursor:not-allowed;opacity:.8}
     .btn-nuevo{background:var(--accent);color:#fff}
     .btn-print{background:var(--success);color:#fff}
     .btn-edit{background:var(--warning);color:#fff}
@@ -56,12 +57,10 @@
     #modal .content,#modalVer .content,#confirmModal .content{background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 25px rgba(0,0,0,0.2);animation:fadeIn .25s ease}
     @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
-    /* sticky areas */
     .modal-header{position:sticky;top:0;background:var(--primary);color:#fff;padding:12px 16px;font-size:1.1rem;font-weight:600;border-radius:16px 16px 0 0;z-index:5;display:flex;align-items:center;gap:10px;justify-content:center}
     .modal-body{padding:16px 16px 0;overflow-y:auto}
     .controls-form{position:sticky;bottom:0;background:#fff;padding:12px 16px;border-top:1px solid #eee;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;z-index:5}
 
-    /* form */
     #formCausa .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:900px){ #formCausa .grid{grid-template-columns:1fr} .container{grid-template-columns:1fr} .sidebar{position:relative;top:auto} }
     #formCausa label{font-weight:600;color:var(--primary);font-size:0.9rem;margin-bottom:4px;display:block}
@@ -74,16 +73,13 @@
     #agregarNota textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;resize:vertical;}
     #agregarNota button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-top:10px;}
 
-    /* view modal content */
     #verContenido p{margin:.35rem 0;font-size:.92rem}
     #verContenido strong{color:var(--primary)}
     .note{border-left:3px solid #3498db;padding:6px;margin:6px 0;background:#f9fbff;border-radius:6px}
 
-    /* action buttons row */
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .top-actions .actions .btn{display:flex;align-items:center}
     
-    /* Prioridad styling */
     .prioridad-pill{
       display: inline-block;
       padding: 4px 8px;
@@ -98,7 +94,6 @@
     .prioridad-alta{background-color: var(--danger);}
     .prioridad-ninguna{background-color: var(--muted);}
 
-    /* New confirmation modal */
     #confirmModal .content {
       max-width: 400px;
       padding: 24px;
@@ -125,7 +120,6 @@
       flex-grow: 1;
     }
 
-    /* floating alert */
     .floating-alert {
       position: fixed;
       top: 20px;
@@ -148,7 +142,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Nuevos estilos para múltiples audiencias */
     .audiencias-container {
       margin-bottom: 10px;
     }
@@ -177,6 +170,27 @@
       padding: 8px 12px;
       cursor: pointer;
       margin-top: 8px;
+    }
+
+    /* Estilos para Paginación */
+    #paginacion-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-top: 15px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    #paginacion-container .page-info {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    #paginacion-container .nav-buttons {
+      display: flex;
+      gap: 8px;
     }
   </style>
 </head>
@@ -235,6 +249,9 @@
           <tbody id="tbodyCompleto"><tr><td colspan="22">Cargando...</td></tr></tbody>
         </table>
       </div>
+      
+      <div id="paginacion-container"></div>
+
     </div>
 
     <aside class="sidebar">
@@ -400,21 +417,17 @@
   const audienciasContainer = $("audiencias-container");
   const btnAgregarAudiencia = $("btnAgregarAudiencia");
 
+  // ===== PAGINACIÓN =====
+  let currentPage = 1;
+  const recordsPerPage = 20;
+
   // ===== Utils (SECCIÓN CORREGIDA) =====
   const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
   
-  /**
-   * Función centralizada para formatear fechas.
-   * CORREGIDA: Mantiene la hora exacta sin conversión de zona horaria
-   * @param {any} d - El valor de la fecha (Timestamp de Firestore, objeto Date, etc.)
-   * @param {boolean} conHora - Si es true, incluye la hora en formato HH:mm.
-   * @returns {string} - La fecha formateada o un string vacío si es inválida.
-   */
   function formatearFecha(d, conHora = false) {
     const fecha = toDate(d);
     if (!fecha || isNaN(fecha)) return "";
 
-    // Obtener componentes de fecha/hora sin ajustes de zona horaria
     const dia = String(fecha.getDate()).padStart(2, '0');
     const mes = String(fecha.getMonth() + 1).padStart(2, '0');
     const año = fecha.getFullYear();
@@ -423,14 +436,12 @@
       return `${dia}/${mes}/${año}`;
     }
     
-    // Para fechas con hora, mantener la hora exacta
     const horas = String(fecha.getHours()).padStart(2, '0');
     const minutos = String(fecha.getMinutes()).padStart(2, '0');
     
     return `${dia}/${mes}/${año} ${horas}:${minutos}`;
   }
 
-  // Esta función se mantiene para la búsqueda, ya que necesita generar múltiples formatos
   function dateStrings(val){
     const date = toDate(val);
     if(!date || isNaN(date)) return [];
@@ -465,6 +476,7 @@
     unsubCausas = db.collection("causas").orderBy("fechaRegistro","desc").onSnapshot(snap=>{
       const arr=[]; snap.forEach(d=>arr.push({id:d.id, ...d.data()}));
       datosCache = arr;
+      currentPage = 1; // Resetear a la página 1 en cada nueva carga de datos
       renderTablas(filtrarDatos());
       renderSidebar(arr);
       poblarFiltroUsuarios(arr);
@@ -506,10 +518,16 @@
       return okTexto && okEstado && okUsuario && okPrioridad;
     });
   }
-  buscador.oninput = ()=>renderTablas(filtrarDatos());
-  filtroEstado.onchange = ()=>renderTablas(filtrarDatos());
-  filtroUsuario.onchange = ()=>renderTablas(filtrarDatos());
-  filtroPrioridad.onchange = ()=>renderTablas(filtrarDatos());
+  
+  const handleFilterChange = () => {
+    currentPage = 1; // Resetear a la primera página al filtrar
+    renderTablas(filtrarDatos());
+  };
+
+  buscador.oninput = handleFilterChange;
+  filtroEstado.onchange = handleFilterChange;
+  filtroUsuario.onchange = handleFilterChange;
+  filtroPrioridad.onchange = handleFilterChange;
 
   // ===== Render =====
   function accionesHTML(id){
@@ -520,8 +538,13 @@
   }
 
   function renderTablas(data){
-    tbody.innerHTML = data.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
-    data.forEach(d=>{
+    // Lógica de paginación
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    tbody.innerHTML = paginatedData.length ? "" : "<tr><td colspan='9'>No hay registros</td></tr>";
+    paginatedData.forEach(d=>{
       tbody.insertAdjacentHTML("beforeend", `
         <tr>
           <td class="mono">${d.numCausa||""}</td>
@@ -536,8 +559,8 @@
         </tr>`);
     });
 
-    tbodyCompleto.innerHTML = data.length ? "" : "<tr><td colspan='22'>No hay registros</td></tr>";
-    data.forEach(d=>{
+    tbodyCompleto.innerHTML = paginatedData.length ? "" : "<tr><td colspan='22'>No hay registros</td></tr>";
+    paginatedData.forEach(d=>{
       const audienciasHTML = Array.isArray(d.audiencias) && d.audiencias.length > 0 
         ? d.audiencias.map(aud => `<div>${formatearFecha(aud, true)}</div>`).join("")
         : (d.audiencias ? formatearFecha(d.audiencias, true) : "");
@@ -572,6 +595,47 @@
     document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
     document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
     document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>abrirConfirmarEliminar(b.dataset.id));
+    
+    renderPaginacion(data.length); // Dibujar controles de paginación
+  }
+
+  // ===== PAGINACIÓN: Render y Controles =====
+  function renderPaginacion(totalRecords) {
+    const container = $("paginacion-container");
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    container.innerHTML = ""; // Limpiar antes de renderizar
+
+    if (totalPages <= 1) {
+      return; // No mostrar paginación si hay una sola página o ninguna
+    }
+
+    const prevDisabled = currentPage === 1 ? 'disabled' : '';
+    const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+
+    container.innerHTML = `
+      <div class="page-info">
+        Página <strong>${currentPage}</strong> de <strong>${totalPages}</strong> (Total: ${totalRecords} registros)
+      </div>
+      <div class="nav-buttons">
+        <button id="btnPrevPage" class="btn btn-ghost" ${prevDisabled}><i class="fa fa-arrow-left"></i> Anterior</button>
+        <button id="btnNextPage" class="btn btn-ghost" ${nextDisabled}>Siguiente <i class="fa fa-arrow-right"></i></button>
+      </div>
+    `;
+
+    $("btnPrevPage").onclick = () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTablas(filtrarDatos());
+      }
+    };
+
+    $("btnNextPage").onclick = () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTablas(filtrarDatos());
+      }
+    };
   }
 
   // ===== Sidebar (eventos próximos) =====
@@ -720,7 +784,6 @@
         const d = snap.data();
         let contenidoHTML = "";
 
-        // Mapeo de claves a etiquetas más legibles
         const etiquetas = {
             numCausa: "N° Expediente", caratula: "Carátula", tipoProceso: "Tipo de Proceso", juzgado: "Juzgado",
             fechaInicio: "Fecha de Inicio", fechaPase: "Fecha de Pase", intervencion: "Intervención",
@@ -731,7 +794,6 @@
             nnyaGesell: "NNyA en Gesell", observaciones: "Observaciones", fechaRegistro: "Fecha de Registro"
         };
         
-        // Orden deseado de las claves
         const ordenClaves = [
             "numCausa", "caratula", "tipoProceso", "juzgado", "estado", "prioridad", "usuarioAsignado",
             "fechaRegistro", "fechaInicio", "fechaPase", "intervencion", "datosNnya", "vencimiento",
@@ -750,7 +812,7 @@
                     });
                 } else if (['fechaInicio', 'fechaRegistro'].includes(k)) {
                     contenidoHTML += `<p><strong>${etiqueta}:</strong> ${formatearFecha(v, false)}</p>`;
-                } else if (v.seconds) { // Para todas las demás fechas/timestamps
+                } else if (v.seconds) {
                     contenidoHTML += `<p><strong>${etiqueta}:</strong> ${formatearFecha(v, true)}</p>`;
                 } else if (k !== "audiencias") {
                     contenidoHTML += `<p><strong>${etiqueta}:</strong> ${v}</p>`;
@@ -836,36 +898,24 @@
     return datos;
   }
   
-  /**
-   * ✅ FUNCIÓN CORREGIDA
-   * Carga los datos de un expediente en el formulario, asegurando que las fechas y horas
-   * se muestren correctamente en la zona horaria local del usuario.
-   */
   function cargarDatosEnForm(d) {
-      // Helper para formatear un objeto Date a un string para inputs (date o datetime-local)
       const formatFechaParaInput = (fecha, conHora = true) => {
           if (!fecha || isNaN(fecha)) return "";
-
-          // Usamos los componentes de la fecha/hora LOCAL para que coincida con lo que el usuario ingresó
           const año = fecha.getFullYear();
           const mes = String(fecha.getMonth() + 1).padStart(2, '0');
           const dia = String(fecha.getDate()).padStart(2, '0');
-
           if (!conHora) {
               return `${año}-${mes}-${dia}`;
           }
-
           const horas = String(fecha.getHours()).padStart(2, '0');
           const minutos = String(fecha.getMinutes()).padStart(2, '0');
           return `${año}-${mes}-${dia}T${horas}:${minutos}`;
       };
-
-      // Helper para asignar un valor a un campo del formulario
       const setVal = (id, val) => {
           const el = $(id);
           if (!el) return;
           if (val?.seconds) {
-              const fecha = toDate(val); // Convierte el timestamp de Firebase a un objeto Date local
+              const fecha = toDate(val);
               if (el.type === "date") {
                   el.value = formatFechaParaInput(fecha, false);
               } else if (el.type === "datetime-local") {
@@ -877,20 +927,13 @@
               el.value = val ?? "";
           }
       };
-
-      initForm(); // Resetea y prepara el formulario
+      initForm();
       if (d.tipoProceso) {
           selTipo.value = d.tipoProceso;
           actualizarJuzgados();
       }
-
-      // Poblar campos de texto y select
       ["numCausa", "caratula", "tipoProceso", "juzgado", "intervencion", "datosNnya", "usuarioAsignado", "estado", "prioridad", "recursos", "recursosContestacion", "estadoRecursos", "nnyaGesell", "observaciones"].forEach(k => setVal(k, d[k]));
-      
-      // Poblar campos de fecha/hora
       ["fechaInicio", "fechaPase", "vencimiento", "vencimientoRecursos", "audienciaGesell"].forEach(k => setVal(k, d[k]));
-
-      // Poblar las audiencias múltiples
       audienciasContainer.innerHTML = "";
       if (Array.isArray(d.audiencias) && d.audiencias.length > 0) {
           d.audiencias.forEach(aud => {
@@ -900,10 +943,8 @@
               }
           });
       } else {
-          agregarAudiencia(); // Agrega un campo de audiencia vacío si no hay ninguna
+          agregarAudiencia();
       }
-
-      // Habilitar y poblar campos de Cámara Gesell si aplica
       const habilitar = !!(d.audienciaGesell || d.nnyaGesell);
       $("habilitarAudienciaGesell").checked = habilitar;
       toggleGesell(habilitar);
