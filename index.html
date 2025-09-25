@@ -562,6 +562,7 @@
   const filtroEstado = $("filtroEstado");
   const filtroUsuario = $("filtroUsuario");
   const filtroPrioridad = $("filtroPrioridad");
+  const numCausaInput = $("numCausa");
   
   const notaBitacora = $("notaBitacora");
   const historialNotas = $("historialNotas");
@@ -937,35 +938,29 @@
     };
   };
 
-  const confirmacionGuardar = () => {
+  const confirmacionGuardar = async () => {
     if (!validateForm()) {
         mostrarAlertaPersonalizada("Error de Validación", "Por favor, completa los campos obligatorios.");
         return; 
     }
-    const mensaje = (modo === "nuevo") ? "¿Estás seguro de que quieres guardar este expediente?" : "¿Estás seguro de que quieres actualizar este expediente?";
-    
-    const onConfirm = async () => {
-        const datos = recolectarDatosForm();
-        const btnGuardar = $("btnGuardar");
-        btnGuardar.disabled = true;
-        try{
-            if (modo==="nuevo"){
-              await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
-              mostrarAlertaPersonalizada("¡Éxito!", "Expediente guardado correctamente.");
-            }else{
-              await db.collection("causas").doc(editId.value).update(datos);
-              mostrarAlertaPersonalizada("¡Éxito!", "Expediente actualizado correctamente.");
-            }
-            modal.style.display = "none";
-        }catch(e){ 
-            console.error(e); 
-            mostrarAlertaPersonalizada("Error", "No se pudo guardar. Revisa la consola."); 
-        } finally {
-            btnGuardar.disabled = false;
-            confirmModal.style.display = "none";
+    const datos = recolectarDatosForm();
+    const btnGuardar = $("btnGuardar");
+    btnGuardar.disabled = true;
+    try{
+        if (modo==="nuevo"){
+          await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
+          mostrarAlertaPersonalizada("¡Éxito!", "Expediente guardado correctamente.");
+        }else{
+          await db.collection("causas").doc(editId.value).update(datos);
+          mostrarAlertaPersonalizada("¡Éxito!", "Expediente actualizado correctamente.");
         }
-    };
-    mostrarConfirmacion("Confirmar Acción", mensaje, onConfirm);
+        modal.style.display = "none";
+    }catch(e){ 
+        console.error(e); 
+        mostrarAlertaPersonalizada("Error", "No se pudo guardar. Revisa la consola."); 
+    } finally {
+        btnGuardar.disabled = false;
+    }
   };
   
   $("btnGuardar").onclick = confirmacionGuardar;
@@ -1342,7 +1337,44 @@
   });
   
   let modo = "nuevo";
-  
+
+  // --- NUEVA LÓGICA: Validacion de Expediente en tiempo real ---
+  function showFloatingAlert(message, duration = 3000) {
+    floatingAlert.textContent = message;
+    floatingAlert.classList.add('show');
+    setTimeout(() => {
+        floatingAlert.classList.remove('show');
+    }, duration);
+  }
+
+  numCausaInput.addEventListener('input', () => {
+    // Si el modo no es "nuevo", no hacemos la validación en tiempo real.
+    if (modo !== 'nuevo') return;
+
+    const numCausa = numCausaInput.value.trim();
+    const numCausaExistente = datosCache.some(d => d.numCausa === numCausa);
+    
+    // Si el campo está vacío, no mostramos el error ni la alerta
+    if (numCausa === '') {
+        const numCausaField = numCausaInput.closest('.field');
+        numCausaField.classList.remove('error');
+        numCausaField.querySelector('.error-message').textContent = "Este campo es obligatorio.";
+        floatingAlert.classList.remove('show');
+        return;
+    }
+
+    if (numCausaExistente) {
+        showFloatingAlert("Esta causa ya se encuentra registrada.");
+        const numCausaField = numCausaInput.closest('.field');
+        numCausaField.classList.add('error');
+        numCausaField.querySelector('.error-message').textContent = "Esta causa ya se encuentra registrada.";
+    } else {
+        const numCausaField = numCausaInput.closest('.field');
+        numCausaField.classList.remove('error');
+        floatingAlert.classList.remove('show');
+    }
+  });
+
   // Inicialización de la aplicación
   async function initApp() {
       try {
