@@ -117,26 +117,30 @@
     .alert-danger{ background: var(--danger); color: white; }
     .alert-success{ background: var(--success); color: white; }
     
+    /* MODIFICACIONES PARA LA ALERTA FLOTANTE */
     .floating-alert {
       position: fixed;
-      top: 20px;
+      top: -100px;
       left: 50%;
       transform: translateX(-50%);
       background-color: var(--danger);
       color: #fff;
-      padding: 12px 24px;
+      padding: 12px 20px; /* Ajuste para tamaño mediano */
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       z-index: 1000;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      max-width: 400px; /* Tamaño máximo para responsividad */
+      text-align: center;
+      font-size: 1rem; /* Aumento de tamaño de fuente */
     }
 
     .floating-alert.show {
       opacity: 1;
       visibility: visible;
-      transform: translateX(-50%) translateY(0);
+      top: 20px;
     }
 
     .audiencias-container {
@@ -513,8 +517,8 @@
 
   <div id="confirmModal">
     <div class="content">
-      <h3>¿Estás seguro?</h3>
-      <p>Esta acción eliminará el registro de forma permanente. No se puede deshacer.</p>
+      <h3 id="confirmModalTitle"></h3>
+      <p id="confirmModalMessage"></p>
       <div class="actions-row">
         <button id="btnConfirmarEliminar" class="btn btn-delete"><i class="fa fa-trash"></i> Eliminar</button>
         <button id="btnCancelarEliminar" class="btn btn-ghost"><i class="fa fa-xmark"></i> Cancelar</button>
@@ -1161,6 +1165,14 @@
       $("btnGuardar").disabled = !enable;
   }
   
+  function mostrarAlertaFlotante(mensaje) {
+      floatingAlert.textContent = mensaje;
+      floatingAlert.classList.add('show');
+      setTimeout(() => {
+          floatingAlert.classList.remove('show');
+      }, 3000); // Oculta después de 3 segundos
+  }
+
   function validarExistenciaCausa() {
       if (modo !== "nuevo") return;
       const numCausa = $("numCausa").value.trim();
@@ -1170,6 +1182,7 @@
       if (numCausaExistente) {
           numCausaField.classList.add('error');
           numCausaField.querySelector('.error-message').textContent = "Esta causa ya se encuentra registrada.";
+          mostrarAlertaFlotante("Causa registrada antes, vuelva a intentar con otro numero.");
           toggleFormFields(false);
       } else {
           numCausaField.classList.remove('error');
