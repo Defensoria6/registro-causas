@@ -730,10 +730,18 @@
     const prio = (filtroPrioridad.value || "").toLowerCase();
     
     return datosCache.filter(d => {
-      const okTexto = !q || (d.numCausa?.toLowerCase().includes(q) || d.caratula?.toLowerCase().includes(q));
-      const okEstado = !est || (d.estado || "").toLowerCase() === est;
-      const okUsuario = !usu || (d.usuarioAsignado || "").toLowerCase() === usu;
-      const okPrioridad = !prio || (d.prioridad || "").toLowerCase() === prio;
+      // Lógica de búsqueda mejorada para buscar en todos los campos de texto
+      const okTexto = !q || Object.values(d).some(value => {
+          // Convertir el valor a string para asegurar que la búsqueda funciona con todos los tipos
+          // y pasar a minúsculas para una búsqueda sin distinción de mayúsculas
+          const stringValue = String(value || "").toLowerCase();
+          return stringValue.includes(q);
+      });
+
+      const okEstado = !est || (String(d.estado) || "").toLowerCase() === est;
+      const okUsuario = !usu || (String(d.usuarioAsignado) || "").toLowerCase() === usu;
+      const okPrioridad = !prio || (String(d.prioridad) || "").toLowerCase() === prio;
+
       return okTexto && okEstado && okUsuario && okPrioridad;
     });
   }
