@@ -761,7 +761,6 @@
   function accionesHTML(id){
     return `<button class="btn-view" data-id="${id}" title="Ver"><i class="fa fa-eye"></i></button>
             <button class="btn-edit" data-id="${id}" title="Editar"><i class="fa fa-pen"></i></button>
-            <button class="btn-delete" data-id="${id}" title="Eliminar"><i class="fa fa-trash"></i></button>
             <a href="https://defensoria6.github.io/linea-tiempo/?id=${id}" class="btn-view" title="Ver Línea de Tiempo"><i class="fa-solid fa-timeline"></i></a>`;
   }
 
@@ -784,7 +783,6 @@
 
     document.querySelectorAll(".btn-view").forEach(b=>b.onclick=()=>abrirVer(b.dataset.id));
     document.querySelectorAll(".btn-edit").forEach(b=>b.onclick=()=>abrirEditar(b.dataset.id));
-    document.querySelectorAll(".btn-delete").forEach(b=>b.onclick=()=>abrirConfirmarEliminar(b.dataset.id));
   }
 
   // ===== PAGINACIÓN: Render y Controles =====
