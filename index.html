@@ -136,6 +136,9 @@
       text-align: center;
       font-size: 1rem; /* Aumento de tamaño de fuente */
     }
+    .floating-alert.success {
+      background-color: var(--success);
+    }
 
     .floating-alert.show {
       opacity: 1;
@@ -949,38 +952,43 @@
     };
   };
 
-  const confirmacionGuardar = () => {
+  const mostrarAlertaFlotante = (mensaje, tipo) => {
+    floatingAlert.textContent = mensaje;
+    floatingAlert.classList.remove('danger', 'success');
+    floatingAlert.classList.add(tipo);
+    floatingAlert.classList.add('show');
+    setTimeout(() => {
+        floatingAlert.classList.remove('show');
+    }, 3000); // Oculta después de 3 segundos
+  };
+
+  const guardarExpediente = async () => {
     if (!validateForm()) {
-        mostrarAlertaPersonalizada("Error de Validación", "Por favor, completa los campos obligatorios.");
-        return; 
+      mostrarAlertaPersonalizada("Error de Validación", "Por favor, completa los campos obligatorios.");
+      return;
     }
-    const mensaje = (modo === "nuevo") ? "¿Estás seguro de que quieres guardar este expediente?" : "¿Estás seguro de que quieres actualizar este expediente?";
+    const datos = recolectarDatosForm();
+    const btnGuardar = $("btnGuardar");
+    btnGuardar.disabled = true;
     
-    const onConfirm = async () => {
-        const datos = recolectarDatosForm();
-        const btnGuardar = $("btnGuardar");
-        btnGuardar.disabled = true;
-        try{
-            if (modo==="nuevo"){
-              await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
-              mostrarAlertaPersonalizada("¡Éxito!", "Expediente guardado correctamente.");
-            }else{
-              await db.collection("causas").doc(editId.value).update(datos);
-              mostrarAlertaPersonalizada("¡Éxito!", "Expediente actualizado correctamente.");
-            }
-            modal.style.display = "none";
-        }catch(e){ 
-            console.error(e); 
-            mostrarAlertaPersonalizada("Error", "No se pudo guardar. Revisa la consola."); 
-        } finally {
-            btnGuardar.disabled = false;
-            confirmModal.style.display = "none";
-        }
-    };
-    mostrarConfirmacion("Confirmar Acción", mensaje, onConfirm);
+    try {
+      if (modo === "nuevo") {
+        await db.collection("causas").add({...datos, fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()});
+      } else {
+        await db.collection("causas").doc(editId.value).update(datos);
+      }
+      mostrarAlertaFlotante("Se guardó correctamente el expediente.", 'success');
+      modal.style.display = "none";
+      resetFormCausa();
+    } catch (e) {
+      console.error(e);
+      mostrarAlertaPersonalizada("Error", "No se pudo guardar. Revisa la consola para más detalles.");
+    } finally {
+      btnGuardar.disabled = false;
+    }
   };
   
-  $("btnGuardar").onclick = confirmacionGuardar;
+  $("btnGuardar").onclick = guardarExpediente;
   
   // No hay botón cancelar, se elimina el handler
   // const confirmacionCancelar = () => {
@@ -1164,14 +1172,6 @@
       });
       $("btnGuardar").disabled = !enable;
   }
-  
-  function mostrarAlertaFlotante(mensaje) {
-      floatingAlert.textContent = mensaje;
-      floatingAlert.classList.add('show');
-      setTimeout(() => {
-          floatingAlert.classList.remove('show');
-      }, 3000); // Oculta después de 3 segundos
-  }
 
   function validarExistenciaCausa() {
       if (modo !== "nuevo") return;
@@ -1182,7 +1182,7 @@
       if (numCausaExistente) {
           numCausaField.classList.add('error');
           numCausaField.querySelector('.error-message').textContent = "Esta causa ya se encuentra registrada.";
-          mostrarAlertaFlotante("Causa registrada antes, vuelva a intentar con otro numero.");
+          mostrarAlertaFlotante("Causa registrada antes, vuelva a intentar con otro numero.", 'danger');
           toggleFormFields(false);
       } else {
           numCausaField.classList.remove('error');
