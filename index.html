@@ -299,7 +299,7 @@
       </div>
       <div class="controls-form">
         <button class="btn-add" type="button" id="btnGuardar"><i class="fa fa-save"></i>Guardar</button>
-        <button class="btn-delete" type="button" id="btnEliminar"><i class="fa fa-trash"></i>Eliminar</button>
+        <!-- QUITADO EL BOTÓN ELIMINAR DEL MODAL DE EDICIÓN -->
         <button class="btn-print" type="button" id="btnPrintForm"><i class="fa fa-print"></i>Imprimir</button>
         <button class="btn-cancel" type="button" id="btnCancelar"><i class="fa fa-times"></i>Cancelar</button>
       </div>
@@ -353,6 +353,8 @@
     messagingSenderId: "186064671470",
     appId: "1:186064671470:web:b58bae5eadbe6e469f19ff"
   };
+  
+  // Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
@@ -394,7 +396,7 @@
   let queryDirection = 'next';
   let history = []; // Historial para la navegación 'atrás'
   
-  // ===== Utils (SECCIÓN CORREGIDA) =====
+  // ===== Utils - REEMPLAZADO con la lógica de causacompacto =====
   const toDate = (v)=> v?.toDate ? v.toDate() : (v?.seconds ? new Date(v.seconds*1000) : (v ? new Date(v) : null));
   
   function formatearFecha(d, conHora = false) {
@@ -438,10 +440,86 @@
     return "prioridad-ninguna";
   };
 
-
   let datosCache = [];
   let causaActualId = null;
   let unsubCausas = null;
+
+  // Variables para datos dinámicos de Firestore
+  let usuariosCache = [];
+  let juzgadosPorTipoCache = {};
+
+  // ===== Funciones para cargar datos de Firestore =====
+  async function cargarUsuarios() {
+      try {
+          const snapshot = await db.collection("usuarios").get();
+          usuariosCache = [];
+          snapshot.forEach(doc => {
+              const data = doc.data();
+              if (data.nombreCompleto) {
+                  usuariosCache.push(data.nombreCompleto);
+              }
+          });
+          // ORDENAR USUARIOS ALFABÉTICAMENTE
+          usuariosCache.sort((a, b) => a.localeCompare(b));
+          return usuariosCache;
+      } catch (e) {
+          console.error("Error al cargar usuarios:", e);
+          throw e;
+      }
+  }
+
+  async function cargarJuzgados() {
+      try {
+          const snapshot = await db.collection("juzgados").get();
+          juzgadosPorTipoCache = {};
+          snapshot.forEach(doc => {
+              const { tipo, nombre } = doc.data();
+              if (tipo && nombre) {
+                  if (!juzgadosPorTipoCache[tipo]) {
+                      juzgadosPorTipoCache[tipo] = [];
+                  }
+                  juzgadosPorTipoCache[tipo].push(nombre);
+              }
+          });
+          // ORDENAR JUZGADOS ALFABÉTICAMENTE POR TIPO Y NOMBRE
+          Object.keys(juzgadosPorTipoCache).forEach(tipo => {
+              juzgadosPorTipoCache[tipo].sort((a, b) => a.localeCompare(b));
+          });
+          return juzgadosPorTipoCache;
+      } catch (e) {
+          console.error("Error al cargar juzgados:", e);
+          throw e;
+      }
+  }
+
+  // ===== Funciones para poblar selects =====
+  function poblarTiposProceso() {
+      const selTipo = $("tipoProceso");
+      // ORDENAR TIPOS DE PROCESO ALFABÉTICAMENTE
+      const tipos = Object.keys(juzgadosPorTipoCache).sort((a, b) => a.localeCompare(b));
+      selTipo.innerHTML = '<option value="">Seleccione un tipo</option>' + 
+          tipos.map(t => `<option value="${t}">${t}</option>`).join('');
+  }
+
+  function poblarJuzgadosPorTipo(tipoSeleccionado) {
+      const selJuz = $("juzgado");
+      const juzgados = juzgadosPorTipoCache[tipoSeleccionado] || [];
+      selJuz.innerHTML = '<option value="">Seleccione un juzgado</option>' + 
+          juzgados.map(j => `<option value="${j}">${j}</option>`).join('');
+  }
+
+  function poblarSelectUsuarios() {
+      const selUsu = $("usuarioAsignado");
+      selUsu.innerHTML = '<option value="">Seleccione un usuario</option>' + 
+          usuariosCache.map(u => `<option value="${u}">${u}</option>`).join('');
+  }
+
+  function poblarFiltroUsuarios() {
+      const current = filtroUsuario.value; 
+      filtroUsuario.innerHTML = '<option value="">Usuario (todos)</option>' + 
+          usuariosCache.map(u => `<option value="${u}">${u}</option>`).join('');
+      if (current) filtroUsuario.value = current;
+  }
 
   // ===== Lógica de paginación y carga de datos desde el servidor =====
   function suscribirCausas() {
@@ -492,7 +570,7 @@
             }));
             datosCache = arr; // Mantener un cache completo para los filtros del cliente
             renderSidebar(arr);
-            poblarFiltroUsuarios(arr);
+            poblarFiltroUsuarios();
           });
         }
       },
@@ -527,6 +605,7 @@
   const handleFilterChange = () => {
     const filteredData = filtrarDatos();
     renderTablas(filteredData);
+    renderSidebar(filteredData);
     // Ocultar la paginación del servidor cuando se usan los filtros
     $("paginacion-container").style.display = filteredData.length > recordsPerPage ? "flex" : "none";
   };
@@ -596,53 +675,78 @@
     };
   }
 
-  // ===== Sidebar (eventos próximos) =====
+  // ===== Sidebar (eventos próximos) - CORREGIDA =====
   function renderSidebar(data){
     const hoy = new Date();
     const limite = new Date(hoy.getTime() + 30*24*60*60*1000);
     const eventos = {aud:[], ges:[], venc:[], vrec:[]};
-    const pushIfRange = (arr, fecha, label)=>{ const f = toDate(fecha); if(!f || isNaN(f)) return; if(f>=hoy && f<=limite) arr.push({f,label}); };
+    
+    const pushIfRange = (arr, fecha, label)=>{ 
+      const f = toDate(fecha); 
+      if(!f || isNaN(f)) return; 
+      if(f >= hoy && f <= limite) arr.push({f, label}); 
+    };
+    
     data.forEach(d=>{
       const id = d.numCausa || d.id;
       
+      // Audiencias
       if (Array.isArray(d.audiencias)) {
-        d.audiencias.forEach(aud => pushIfRange(eventos.aud, aud, `${id}`));
+        d.audiencias.forEach(aud => {
+          pushIfRange(eventos.aud, aud, `${id} - Audiencia`);
+        });
       } else if (d.audiencias) {
-        pushIfRange(eventos.aud, d.audiencias, `${id}`);
+        pushIfRange(eventos.aud, d.audiencias, `${id} - Audiencia`);
       }
       
-      pushIfRange(eventos.ges, d.audienciaGesell, `${id}`);
-      pushIfRange(eventos.venc, d.vencimiento, `${id}`);
-      pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} — ${d.recursos||'Recurso'}`);
+      // Cámara Gesell
+      pushIfRange(eventos.ges, d.audienciaGesell, `${id} - Cámara Gesell`);
+      
+      // Vencimientos
+      pushIfRange(eventos.venc, d.vencimiento, `${id} - Vencimiento`);
+      
+      // Vencimientos de Recursos
+      pushIfRange(eventos.vrec, d.vencimientoRecursos, `${id} - ${d.recursos||'Recurso'}`);
     });
+    
     const renderList = (arr, target, counterRef, empty)=>{
-      arr.sort((a,b)=>a.f-b.f); target.innerHTML="";
-      if(!arr.length){ target.innerHTML = `<div class="k">${empty}</div>`; counterRef.textContent = "0"; return; }
+      // Ordenar por fecha
+      arr.sort((a,b)=>a.f - b.f); 
+      target.innerHTML="";
+      
+      if(!arr.length){ 
+        target.innerHTML = `<div class="k">${empty}</div>`; 
+        counterRef.textContent = "0"; 
+        return; 
+      }
+      
       counterRef.textContent = String(arr.length);
-      arr.forEach(e=> target.insertAdjacentHTML("beforeend", `<div class="event"><div class="when">${formatearFecha(e.f, true)}</div><div class="what">— ${e.label}</div></div>`));
+      arr.forEach(e=> {
+        target.insertAdjacentHTML("beforeend", 
+          `<div class="event">
+            <div class="when">${formatearFecha(e.f, true)}</div>
+            <div class="what">— ${e.label}</div>
+          </div>`
+        );
+      });
     };
+    
     renderList(eventos.aud, listAud, cAud, "No hay audiencias próximas");
     renderList(eventos.ges, listGes, cGes, "No hay Cámaras Gesell próximas");
     renderList(eventos.venc, listVenc, cVenc, "No hay vencimientos próximos");
     renderList(eventos.vrec, listVrec, cVrec, "No hay venc. de recursos próximos");
   }
 
-  // ===== Filtro usuarios =====
-  function poblarFiltroUsuarios(data){
-    const set = new Set([""]); data.forEach(d=>{ if(d.usuarioAsignado) set.add(d.usuarioAsignado); });
-    const current = filtroUsuario.value; filtroUsuario.innerHTML = "";
-    [...set].forEach(u=>{ const opt = document.createElement("option"); opt.value=u; opt.textContent = u ? u : "Usuario (todos)"; filtroUsuario.appendChild(opt); });
-    filtroUsuario.value = current || "";
-  }
-
   // ===== ABM Causas =====
-  $("btnNuevo").onclick = ()=>{ 
+  $("btnNuevo").onclick = async ()=>{ 
     modo = "nuevo"; 
     resetFormCausa(); 
     editId.value = ""; 
     tituloForm.textContent = "Nuevo Expediente"; 
+    await initForm();
     modal.style.display = "flex"; 
   };
+  
   $("btnGuardar").onclick = async ()=>{
     const datos = recolectarDatosForm();
     if (!datos.numCausa || !datos.caratula || !datos.tipoProceso || !datos.juzgado) { 
@@ -670,6 +774,7 @@
       btnGuardar.disabled = false;
     }
   };
+  
   numCausaInput.addEventListener("blur", () => {
     if (modo === "nuevo") {
       const numCausa = numCausaInput.value.trim();
@@ -681,6 +786,7 @@
       }
     }
   });
+  
   function mostrarAlertaFlotante(mensaje) {
     floatingAlert.textContent = mensaje;
     floatingAlert.classList.add("show");
@@ -688,30 +794,33 @@
       floatingAlert.classList.remove("show");
     }, 5000);
   }
-  $("btnEliminar").onclick = ()=>{
-    const id = editId.value;
-    if (id) {
-      modal.style.display = "none";
-      abrirConfirmarEliminar(id);
-    } else {
-      alert("No hay un expediente seleccionado para eliminar.");
-    }
-  };
+  
+  // QUITADO EL BOTÓN ELIMINAR DEL MODAL DE EDICIÓN
+  // $("btnEliminar").onclick = ()=>{ ... };
+  
   $("btnCancelar").onclick = ()=>{ if (confirm("¿Cancelar? Se perderán los cambios no guardados.")) modal.style.display = "none"; };
+  
   async function abrirEditar(id){
     modo = "editar"; resetFormCausa(); editId.value = id; tituloForm.textContent = "Editar Expediente";
     try{
       const snap = await db.collection("causas").doc(id).get();
-      if (snap.exists){ cargarDatosEnForm(snap.data()); modal.style.display = "flex"; }
+      if (snap.exists){
+        await initForm();
+        cargarDatosEnForm(snap.data());
+        modal.style.display = "flex"; 
+      }
     }catch(e){ console.error(e); alert("No se pudo abrir el registro"); }
   }
+  
   const confirmModal = $("confirmModal");
   const btnConfirmarEliminar = $("btnConfirmarEliminar");
   const btnCancelarEliminar = $("btnCancelarEliminar");
+  
   function abrirConfirmarEliminar(id) {
     btnConfirmarEliminar.dataset.idToDelete = id;
     confirmModal.style.display = "flex";
   }
+  
   btnConfirmarEliminar.addEventListener("click", async () => {
     const idToDelete = btnConfirmarEliminar.dataset.idToDelete;
     if (!idToDelete) {
@@ -727,10 +836,12 @@
       alert("No se pudo eliminar el registro.");
     }
   });
+  
   btnCancelarEliminar.onclick = () => {
     confirmModal.style.display = "none";
     btnConfirmarEliminar.dataset.idToDelete = "";
   };
+  
   async function abrirVer(id){
     causaActualId = id;
     try{
@@ -768,6 +879,9 @@
                     v.forEach(aud => {
                         contenidoHTML += `<p style="margin-left: 20px;">${formatearFecha(aud, true)}</p>`;
                     });
+                } else if (k === "prioridad") {
+                    // RESALTAR PRIORIDAD COMO EN EL LISTADO
+                    contenidoHTML += `<p><strong>${etiqueta}:</strong> <span class="prioridad-pill ${prioridadClase(v)}">${v||"Ninguna"}</span></p>`;
                 } else if (['fechaInicio', 'fechaRegistro'].includes(k)) {
                     contenidoHTML += `<p><strong>${etiqueta}:</strong> ${formatearFecha(v, false)}</p>`;
                 } else if (v.seconds) {
@@ -785,7 +899,8 @@
         console.error(e);
         alert("No se pudo abrir el detalle");
     }
-}
+  }
+  
   async function agregarNota() {
     if (!causaActualId) return alert("No se ha seleccionado una causa.");
     const notaTexto = notaBitacora.value.trim();
@@ -802,8 +917,10 @@
       alert("No se pudo guardar la nota.");
     }
   }
+  
   btnAgregarNota.onclick = agregarNota;
   $("btnCerrarVer").onclick = ()=> modalVer.style.display = "none";
+  
   const printSection = (html)=>{ const w = window.open("","_blank","width=900,height=700"); w.document.write(`<html><head><title>Imprimir</title></head><body>${html}</body></html>`); w.document.close(); w.focus(); w.print(); };
   $("btnPrintListado").onclick = ()=>{ const head = tbody.closest("table").querySelector("thead").outerHTML; const body = tbody.outerHTML; printSection(`<table style="width:100%;border-collapse:collapse">${head}${body}</table>`); };
   $("btnPrintFechas").onclick = ()=>{ const html = `<h3>Audiencias</h3>${listAud.outerHTML}<h3>Cámara Gesell</h3>${listGes.outerHTML}<h3>Vencimientos</h3>${listVenc.outerHTML}<h3>Venc. de Recursos</h3>${listVrec.outerHTML}`; printSection(html); };
@@ -811,48 +928,104 @@
   $("btnPrintRegistro").onclick = ()=> printSection($("verContenido").outerHTML);
 
   // ===== Form =====
-  const juzgadosPorTipo = {
-    Administrativo: ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
-    Civil: ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 8 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
-    Penal: ["Juzgado de Instrucción N° 1 - Posadas","Juzgado de Instrucción N° 2 - Posadas","Juzgado de Instrucción N° 3 - Posadas","Juzgado de Instrucción N° 6 - Posadas","Juzgado de Instrucción N° 7 - Posadas","Juzgado Correccional y de Menores N° 1 - Posadas","Juzgado Correccional y de Menores N° 2 - Posadas","Tribunal Penal N° 1 - Posadas", "Tribunal Penal N° 2 - Posadas"],
-    Laboral: ["Juzgado Laboral N° 1 - Posadas","Juzgado Laboral N° 2 - Posadas","Juzgado Laboral N° 3 - Posadas","Juzgado Laboral N° 4 - Posadas"],
-    Familia: ["Juzgado de Familia N° 1 - Posadas","Juzgado de Familia N° 2 - Posadas","Juzgado de Familia N° 3 - Posadas","Juzgado Familia y VF Garupa", "... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
-    "Violencia Familiar": ["Juzgado de Violencia Familiar N° 1 - Posadas","Juzgado de Violencia Familiar N° 2 - Posadas","Juzgado F y Violencia Familiar Garupa","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
-    Paz: ["Juzgado de Paz Civil Comercial N° 1 - Posadas","Juzgado de Paz Civil Comercial N° 2 - Posadas","Juzgado de Paz de Itaembe Mini - Posadas","Juzgado de Paz de Itaembe Guazu - Posadas","Juzgado de Paz de Villa Cabello - Posadas","Juzgado de Paz de Garupa","Juzgado de Paz de Fatima - Garupa","Juzgado de Paz de Apostoles","Juzgado de Paz Candelaria"]
-  };
-  const usuarios = ["Bazante Nadia Romina","Cardozo Maria Raquel","Cedron Noelia Aurora","Corrales Alicia Mariela","Escobar Monica Graciela","Fioravante Romulo","Gonzalez Alberto Misael","Gonzalez Juan Jose","Gudiño Natalia Esther","Magnani Enzo Luciano","Pablos Patricia","Palacios Ana Gabriela","Ramos Marcelo Gustavo","Riveros Patricia Soledad","Sosa Rita Cecilia"];
   const selTipo = $("tipoProceso"), selJuz = $("juzgado"), selUsu = $("usuarioAsignado"), selPrioridad = $("prioridad");
-  function initForm(){
-    const tipos = ["Administrativo","Civil","Penal","Laboral","Familia","Violencia Familiar","Paz"];
-    selTipo.innerHTML = ""; tipos.forEach(t=>{let o=document.createElement("option");o.value=t;o.textContent=t;selTipo.appendChild(o);});
-    selUsu.innerHTML = ""; usuarios.forEach(u=>{let o=document.createElement("option");o.value=u;o.textContent=u;selUsu.appendChild(o);});
-    selTipo.value = "Administrativo"; actualizarJuzgados();
-    toggleGesell(false); $("habilitarAudienciaGesell").checked = false;
+  
+  async function initForm(){
+    // Poblar los selects con datos de Firestore
+    poblarTiposProceso();
+    poblarSelectUsuarios();
+    
+    // Vincular el evento para actualizar juzgados cuando cambie el tipo de proceso
+    selTipo.addEventListener("change", function() {
+        poblarJuzgadosPorTipo(this.value);
+    });
+    
+    toggleGesell(false); 
+    $("habilitarAudienciaGesell").checked = false;
   }
-  function actualizarJuzgados(){ const tipo = selTipo.value; const j = juzgadosPorTipo[tipo]||[]; selJuz.innerHTML=""; j.forEach(x=>{let o=document.createElement("option");o.value=x;o.textContent=x;selJuz.appendChild(o);}); }
-  selTipo.addEventListener("change", actualizarJuzgados);
+  
   $("intervencion").addEventListener("change", function(){
     const datosNnya = $("datosNnya"), contadorNnya = $("counterNnya");
-    if (this.value === "Ministerio Complementario") { datosNnya.removeAttribute("disabled"); contadorNnya.style.display='block'; }
-    else { datosNnya.value = ""; datosNnya.setAttribute("disabled","true"); contadorNnya.style.display='none'; }
+    if (this.value === "Ministerio Complementario") { 
+        datosNnya.removeAttribute("disabled"); 
+        contadorNnya.style.display='block'; 
+    } else { 
+        datosNnya.value = ""; 
+        datosNnya.setAttribute("disabled","true"); 
+        contadorNnya.style.display='none'; 
+    }
   });
-  const limitWords = (text, max)=>{ const words = text.trim().split(/\s+/).filter(Boolean); return words.length > max ? words.slice(0,max).join(" ") : text; };
-  $("observaciones").addEventListener("input", function(){ this.value = limitWords(this.value, 1000); $("counter").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/1000`; });
-  $("datosNnya").addEventListener("input", function(){ this.value = limitWords(this.value, 500); $("counterNnya").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/500`; });
-  $("nnyaGesell").addEventListener("input", function(){ this.value = limitWords(this.value, 400); $("counterNnyaGesell").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/400`; });
-  $("habilitarAudienciaGesell").addEventListener("change", function(){ toggleGesell(this.checked); });
-  function toggleGesell(enabled){ const ag = $("audienciaGesell"), ng = $("nnyaGesell"); if (enabled){ ag.removeAttribute("disabled"); ng.removeAttribute("disabled"); $("counterNnyaGesell").style.display='block'; } else { ag.value = ""; ng.value = ""; ag.setAttribute("disabled","true"); ng.setAttribute("disabled","true"); $("counterNnyaGesell").style.display='none'; } }
-  function resetFormCausa(){ 
-    $("formCausa").reset(); initForm(); $("counter").textContent = "0/1000"; $("counterNnya").textContent = "0/500"; $("counterNnyaGesell").textContent = "0/400"; selPrioridad.value = "Ninguna"; 
-    audienciasContainer.innerHTML = ""; agregarAudiencia();
+  
+  const limitWords = (text, max)=>{ 
+    const words = text.trim().split(/\s+/).filter(Boolean); 
+    return words.length > max ? words.slice(0,max).join(" ") : text; 
+  };
+  
+  $("observaciones").addEventListener("input", function(){ 
+    this.value = limitWords(this.value, 1000); 
+    $("counter").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/1000`; 
+  });
+  
+  $("datosNnya").addEventListener("input", function(){ 
+    this.value = limitWords(this.value, 500); 
+    $("counterNnya").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/500`; 
+  });
+  
+  $("nnyaGesell").addEventListener("input", function(){ 
+    this.value = limitWords(this.value, 400); 
+    $("counterNnyaGesell").textContent = `${this.value.trim().split(/\s+/).filter(Boolean).length}/400`; 
+  });
+  
+  $("habilitarAudienciaGesell").addEventListener("change", function(){ 
+    toggleGesell(this.checked); 
+  });
+  
+  function toggleGesell(enabled){ 
+    const ag = $("audienciaGesell"), ng = $("nnyaGesell"); 
+    if (enabled){ 
+        ag.removeAttribute("disabled"); 
+        ng.removeAttribute("disabled"); 
+        $("counterNnyaGesell").style.display='block'; 
+    } else { 
+        ag.value = ""; 
+        ng.value = ""; 
+        ag.setAttribute("disabled","true"); 
+        ng.setAttribute("disabled","true"); 
+        $("counterNnyaGesell").style.display='none'; 
+    } 
   }
+  
+  function resetFormCausa(){ 
+    $("formCausa").reset(); 
+    $("counter").textContent = "0/1000"; 
+    $("counterNnya").textContent = "0/500"; 
+    $("counterNnyaGesell").textContent = "0/400"; 
+    selPrioridad.value = "Ninguna"; 
+    audienciasContainer.innerHTML = ""; 
+    agregarAudiencia();
+  }
+
   function recolectarDatosForm(){
     const fields = ["numCausa","caratula","tipoProceso","juzgado","fechaInicio","fechaPase","intervencion","datosNnya","vencimiento","usuarioAsignado","estado","prioridad","recursos","recursosContestacion","estadoRecursos","vencimientoRecursos","audienciaGesell","nnyaGesell","observaciones"];
     const datos = {};
-    fields.forEach(id=>{ const el = $(id); if(!el) return; if (["date","datetime-local"].includes(el.type)) { datos[id] = el.value ? new Date(el.value) : null; } else { datos[id] = el.value || ""; } });
+    
+    fields.forEach(id=>{ 
+        const el = $(id); 
+        if(!el) return; 
+        
+        if (["date","datetime-local"].includes(el.type)) { 
+            datos[id] = el.value ? new Date(el.value) : null;
+        } else { 
+            datos[id] = el.value || ""; 
+        } 
+    });
+    
     const audiencias = [];
-    audienciasContainer.querySelectorAll('input[type="datetime-local"]').forEach(input => { if (input.value) audiencias.push(new Date(input.value)); });
+    audienciasContainer.querySelectorAll('input[type="datetime-local"]').forEach(input => { 
+        if (input.value) audiencias.push(new Date(input.value)); 
+    });
     datos.audiencias = audiencias.length > 0 ? audiencias : null;
+    
     return datos;
   }
   
@@ -869,6 +1042,7 @@
           const minutos = String(fecha.getMinutes()).padStart(2, '0');
           return `${año}-${mes}-${dia}T${horas}:${minutos}`;
       };
+      
       const setVal = (id, val) => {
           const el = $(id);
           if (!el) return;
@@ -885,13 +1059,15 @@
               el.value = val ?? "";
           }
       };
-      initForm();
+      
       if (d.tipoProceso) {
           selTipo.value = d.tipoProceso;
-          actualizarJuzgados();
+          poblarJuzgadosPorTipo(d.tipoProceso);
       }
+      
       ["numCausa", "caratula", "tipoProceso", "juzgado", "intervencion", "datosNnya", "usuarioAsignado", "estado", "prioridad", "recursos", "recursosContestacion", "estadoRecursos", "nnyaGesell", "observaciones"].forEach(k => setVal(k, d[k]));
       ["fechaInicio", "fechaPase", "vencimiento", "vencimientoRecursos", "audienciaGesell"].forEach(k => setVal(k, d[k]));
+      
       audienciasContainer.innerHTML = "";
       if (Array.isArray(d.audiencias) && d.audiencias.length > 0) {
           d.audiencias.forEach(aud => {
@@ -903,6 +1079,7 @@
       } else {
           agregarAudiencia();
       }
+      
       const habilitar = !!(d.audienciaGesell || d.nnyaGesell);
       $("habilitarAudienciaGesell").checked = habilitar;
       toggleGesell(habilitar);
@@ -913,17 +1090,55 @@
     item.className = 'audiencia-item';
     item.innerHTML = `<input type="datetime-local" value="${value}"><button type="button" class="btn-eliminar-audiencia"><i class="fa fa-trash"></i></button>`;
     const eliminarBtn = item.querySelector('.btn-eliminar-audiencia');
-    eliminarBtn.onclick = function() { if (audienciasContainer.children.length > 1) item.remove(); else mostrarAlertaFlotante("Debe haber al menos una audiencia"); };
+    eliminarBtn.onclick = function() { 
+        if (audienciasContainer.children.length > 1) {
+            item.remove(); 
+        } else {
+            mostrarAlertaFlotante("Debe haber al menos una audiencia"); 
+        }
+    };
     return item;
   }
-  function agregarAudiencia() { audienciasContainer.appendChild(crearAudienciaItem()); }
+  
+  function agregarAudiencia() { 
+      audienciasContainer.appendChild(crearAudienciaItem()); 
+  }
+  
   btnAgregarAudiencia.onclick = agregarAudiencia;
-  window.addEventListener("click", e=>{ if (e.target === modal) modal.style.display="none"; if (e.target === modalVer) modal.style.display="none"; if (e.target === confirmModal) confirmModal.style.display="none"; });
-  poblarFiltroUsuarios([]);
+  
+  window.addEventListener("click", e=>{ 
+      if (e.target === modal) modal.style.display="none"; 
+      if (e.target === modalVer) modalVer.style.display="none"; 
+      if (e.target === confirmModal) confirmModal.style.display="none"; 
+  });
+  
   let modo = "nuevo";
   
-  initForm();
-  suscribirCausas();
+  // Inicialización de la aplicación
+  async function initApp() {
+      try {
+          // Cargar datos de Firestore
+          await Promise.all([cargarUsuarios(), cargarJuzgados()]);
+          
+          // Poblar filtros y selects
+          poblarFiltroUsuarios();
+          poblarTiposProceso();
+          poblarSelectUsuarios();
+          
+          // Iniciar la suscripción a causas
+          suscribirCausas();
+      } catch (error) {
+          console.error("Error durante la inicialización:", error);
+          alert("Error al cargar los datos iniciales. Verifica la consola para más detalles.");
+      }
+  }
+
+  // Iniciar la aplicación cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+      initApp();
+  }
   </script>
 </body>
 </html>
