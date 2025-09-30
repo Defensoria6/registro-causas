@@ -318,6 +318,12 @@
       <div class="top-actions">
         <div class="filters">
           <input type="text" id="buscador" placeholder="🔍 Buscar..." />
+          <select id="filtroTipoProceso" class="simple">
+            <option value="">Tipo de Proceso (todos)</option>
+            </select>
+          <select id="filtroIntervencion" class="simple">
+            <option value="">Intervención (todas)</option>
+            </select>
           <select id="filtroEstado" class="simple">
             <option value="">Estado (todos)</option>
             <option>En trámite</option><option>Finalizado</option><option>En Alzada</option><option>Archivado</option>
@@ -569,6 +575,8 @@
   const filtroEstado = $("filtroEstado");
   const filtroUsuario = $("filtroUsuario");
   const filtroPrioridad = $("filtroPrioridad");
+  const filtroIntervencion = $("filtroIntervencion"); // NUEVO FILTRO
+  const filtroTipoProceso = $("filtroTipoProceso");   // NUEVO FILTRO
   
   const notaBitacora = $("notaBitacora");
   const historialNotas = $("historialNotas");
@@ -644,6 +652,15 @@
   // Variables para datos dinámicos de Firestore
   let usuariosCache = [];
   let juzgadosPorTipoCache = {};
+  
+  // Opciones para Intervención (extraídas del formulario de alta/edición)
+  const intervencionOptions = [
+    "Ministerio Principal", "Ministerio Complementario", "Patrocinante Actor",
+    "Patrocinante Demandado", "Patrocinante Tercero", "Defensor de Ausente",
+    "Patrocinante presunto incapaz", "Asesor Letrado", "Ministerio Público del incapaz",
+    "Ministerio Público en turno Abril", "Ministerio Público en turno Agosto",
+    "Ministerio Público en turno Diciembre"
+  ];
 
   // ===== Funciones para cargar datos de Firestore =====
   async function cargarUsuarios() {
@@ -690,6 +707,24 @@
       selTipo.innerHTML = '<option value="">Seleccione un tipo</option>' + 
           tipos.map(t => `<option value="${t}">${t}</option>`).join('');
   }
+  
+  // NUEVA FUNCIÓN: Poblar filtro de Tipos de Proceso
+  function poblarFiltroTiposProceso() {
+      const current = filtroTipoProceso.value;
+      const tipos = Object.keys(juzgadosPorTipoCache).sort((a, b) => a.localeCompare(b));
+      
+      filtroTipoProceso.innerHTML = '<option value="">Tipo de Proceso (todos)</option>' + 
+          tipos.map(t => `<option value="${t}">${t}</option>`).join('');
+      if (current) filtroTipoProceso.value = current;
+  }
+  
+  // NUEVA FUNCIÓN: Poblar filtro de Intervención
+  function poblarFiltroIntervencion() {
+      const current = filtroIntervencion.value;
+      filtroIntervencion.innerHTML = '<option value="">Intervención (todas)</option>' + 
+          intervencionOptions.map(i => `<option value="${i}">${i}</option>`).join('');
+      if (current) filtroIntervencion.value = current;
+  }
 
   function poblarJuzgadosPorTipo(tipoSeleccionado) {
       const selJuz = $("juzgado");
@@ -735,6 +770,8 @@
     const est = (filtroEstado.value || "").toLowerCase();
     const usu = (filtroUsuario.value || "").toLowerCase();
     const prio = (filtroPrioridad.value || "").toLowerCase();
+    const interv = (filtroIntervencion.value || "").toLowerCase(); // NUEVO FILTRO
+    const tipoProc = (filtroTipoProceso.value || "").toLowerCase(); // NUEVO FILTRO
     
     return datosCache.filter(d => {
       // Lógica de búsqueda mejorada para buscar en todos los campos de texto
@@ -748,8 +785,10 @@
       const okEstado = !est || (String(d.estado) || "").toLowerCase() === est;
       const okUsuario = !usu || (String(d.usuarioAsignado) || "").toLowerCase() === usu;
       const okPrioridad = !prio || (String(d.prioridad) || "").toLowerCase() === prio;
+      const okIntervencion = !interv || (String(d.intervencion) || "").toLowerCase() === interv; // APLICAR FILTRO INTERVENCION
+      const okTipoProceso = !tipoProc || (String(d.tipoProceso) || "").toLowerCase() === tipoProc; // APLICAR FILTRO TIPO DE PROCESO
 
-      return okTexto && okEstado && okUsuario && okPrioridad;
+      return okTexto && okEstado && okUsuario && okPrioridad && okIntervencion && okTipoProceso;
     });
   }
 
@@ -771,6 +810,8 @@
   filtroEstado.onchange = handleFilterChange;
   filtroUsuario.onchange = handleFilterChange;
   filtroPrioridad.onchange = handleFilterChange;
+  filtroIntervencion.onchange = handleFilterChange; // NUEVO EVENTO
+  filtroTipoProceso.onchange = handleFilterChange;   // NUEVO EVENTO
   
   // ===== Render =====
   function accionesHTML(id){
@@ -1401,7 +1442,9 @@
           await Promise.all([cargarUsuarios(), cargarJuzgados()]);
           
           poblarFiltroUsuarios();
-          poblarTiposProceso();
+          poblarTiposProceso(); // Para el formulario
+          poblarFiltroTiposProceso(); // Para el filtro nuevo
+          poblarFiltroIntervencion(); // Para el filtro nuevo
           poblarSelectUsuarios();
           
           suscribirCausas();
